@@ -1,5 +1,6 @@
 from django.contrib.auth.models import User
 from django.db import models
+from django.db.models.signals import pre_save
 from django.template.defaultfilters import slugify
 from django.utils import timezone
 from django import forms
@@ -22,11 +23,10 @@ class Article(models.Model):
 	def __unicode__(self):
 		return self.title + ' - ' + self.author.name
 
-	def save(self, *args, **kwargs):
-		if not self.id:
-			self.slug = slugify(self.title)
+def set_slug(sender, instance, *args, **kwargs):
+		instance.slug = slugify(instance.title)
 
-		super(Article, self).save(*args, **kwargs)
+pre_save.connect(set_slug, sender=Article)
 		
 
 class RegisterForm(forms.Form):

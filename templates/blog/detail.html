@@ -2,15 +2,13 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Blog Title</title>
+    <title>Blog Title - {{ article.title }}</title>
     <link href="{% static "bootstrap/css/bootstrap.min.css" %}" rel="stylesheet" media="screen">
   </head>
   <body>
-    {% for article in latest_articles_list %}
-    <h1><a href="/blog/{{ article.publication_date|date:"Y" }}/{{ article.publication_date|date:"m" }}/{{ article.slug }}">{{ article.title }}</a></h1>
+    <h1>{{ article.title }}</h1>
     <h3>{{ article.author }}  -  {{ article.publication_date }}</h3>
-    <p>{{ article.text|linebreaks|truncatewords:180 }}</p>
-    {% endfor %}
+    <p>{{ article.text|linebreaks }}</p>
     <script src="http://code.jquery.com/jquery.js"></script>
     <script src="{% static "bootstrap/js/bootstrap.min.js" %}"></script>
   </body>
