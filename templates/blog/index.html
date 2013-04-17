@@ -1,0 +1,17 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Blog Title</title>
+    <link href="{% static "bootstrap/css/bootstrap.min.css" %}" rel="stylesheet" media="screen">
+  </head>
+  <body>
+    {% for article in latest_articles_list %}
+    <h1>{{ article.title }}</h1>
+    <h3>{{ article.author }}  -  {{ article.publication_date }}</h3>
+    <p>{{ article.text|linebreaks|truncatewords:180 }}</p>
+    {% endfor %}
+    <script src="http://code.jquery.com/jquery.js"></script>
+    <script src="{% static "bootstrap/js/bootstra.min.js" %}"></script>
+  </body>
+</html>
