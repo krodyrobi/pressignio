@@ -8,6 +8,7 @@ from django import forms
 class Author(models.Model):
 	user = models.OneToOneField(User)
 	name = models.CharField(max_length=100)
+	slug = models.SlugField()
 	description = models.TextField()
 
 	def __unicode__(self):
@@ -23,10 +24,15 @@ class Article(models.Model):
 	def __unicode__(self):
 		return self.title + ' - ' + self.author.name
 
-def set_slug(sender, instance, *args, **kwargs):
-		instance.slug = slugify(instance.title)
+def set_slug_author(sender, instance, *args, **kwargs):
+	instance.slug = slugify(instance.name)
 
-pre_save.connect(set_slug, sender=Article)
+pre_save.connect(set_slug_author, sender=Author)
+
+def set_slug_article(sender, instance, *args, **kwargs):
+	instance.slug = slugify(instance.title)
+
+pre_save.connect(set_slug_article, sender=Article)
 		
 
 class RegisterForm(forms.Form):

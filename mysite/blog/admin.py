@@ -5,6 +5,7 @@ from blog.models import Author, Article
 
 class AuthorInline(admin.StackedInline):
 	model = Author
+	fields = ("name", "description");
 
 class UserAdmin(UserAdmin):
 	inlines = (AuthorInline,)

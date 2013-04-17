@@ -2,13 +2,12 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Blog Title - {{ article.title }}</title>
+    <title>Blog Title - {{ author.name }}</title>
     <link href="{% static "bootstrap/css/bootstrap.min.css" %}" rel="stylesheet" media="screen">
   </head>
   <body>
-    <h1>{{ article.title }}</h1>
-    <h3><a href="/blog/{{ article.author.slug }}">{{ article.author }}</a>  -  {{ article.publication_date }}</h3>
-    <p>{{ article.text|linebreaks }}</p>
+    <h1>{{ author.name }}</h1>
+    <p>{{ author.description|linebreaks }}</p>
     <script src="http://code.jquery.com/jquery.js"></script>
     <script src="{% static "bootstrap/js/bootstrap.min.js" %}"></script>
   </body>
