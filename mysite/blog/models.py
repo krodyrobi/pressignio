@@ -2,6 +2,7 @@ from django.contrib.auth.models import User
 from django.db import models
 from django.template.defaultfilters import slugify
 from django.utils import timezone
+from django import forms
 
 class Author(models.Model):
 	user = models.OneToOneField(User)
@@ -27,3 +28,12 @@ class Article(models.Model):
 
 		super(Article, self).save(*args, **kwargs)
 		
+
+class RegisterForm(forms.Form):
+    	username = forms.CharField(max_length=30)
+    	password = forms.CharField(widget=forms.PasswordInput)
+
+	first_name = forms.CharField(max_length=30)
+	last_name = forms.CharField(max_length=30)
+
+	email = forms.EmailField()
