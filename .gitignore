@@ -3,4 +3,4 @@
 *.pyc
 local_settings.py
 *~
-mysite/settings.py
+settings.py
