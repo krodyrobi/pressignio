@@ -8,6 +8,11 @@
   <body>
     <h1>{{ author.name }}</h1>
     <p>{{ author.description|linebreaks }}</p>
+     {% for article in latest_articles_list %}
+    <h1><a href="/blog/{{ article.publication_date|date:"Y" }}/{{ article.publication_date|date:"m" }}/{{ article.slug }}">{{ article.title }}</a></h1>
+    <h3><a href="/blog/{{ article.author.slug }}">{{ article.author }}</a>  -  {{ article.publication_date }}</h3>
+    <p>{{ article.text|linebreaks|truncatewords:180 }}</p>
+    {% endfor %}
     <script src="http://code.jquery.com/jquery.js"></script>
     <script src="{% static "bootstrap/js/bootstrap.min.js" %}"></script>
   </body>

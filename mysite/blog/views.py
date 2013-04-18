@@ -32,4 +32,6 @@ def detail(request, title_slug, year, month):
 
 def author(request, name_slug):
 	author = get_object_or_404(Author, slug=name_slug)
-	return render_to_response('blog/author.html', {'author': author})
+	latest_articles_list = Article.objects.filter(author=author).order_by('-publication_date')[:3]
+	return render_to_response('blog/author.html', {'author': author,
+		'latest_articles_list': latest_articles_list})
