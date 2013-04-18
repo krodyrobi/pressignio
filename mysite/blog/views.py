@@ -41,6 +41,9 @@ def login_user(request):
 			else:
 				return render_to_response('blog/login.html', {'is_good': False, 'form': form},
 					context_instance=RequestContext(request))
+		else:
+			return render_to_response('blog/login.html', {'is_good': True, 'form': form},
+					context_instance=RequestContext(request))
 	else:
 		form = LoginForm()
 		return render_to_response('blog/login.html', {'is_good': True, 'form': form},
