@@ -16,8 +16,9 @@ def index_register(request):
 def register_user(request):
 	username = request.POST['username']
 	password = request.POST['password']
-	first_name = request.POST['first_name']
-	last_name = request.POST['last_name']
+	pass_check = request.POST['pass_check']
+	author_name = request.POST['author_name']
+
 	email = request.POST['email']
 
 	login_date_time = datetime.datetime.now()

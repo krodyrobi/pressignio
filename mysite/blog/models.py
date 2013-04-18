@@ -33,13 +33,3 @@ def set_slug_article(sender, instance, *args, **kwargs):
 	instance.slug = slugify(instance.title)
 
 pre_save.connect(set_slug_article, sender=Article)
-		
-
-class RegisterForm(forms.Form):
-    	username = forms.CharField(max_length=30)
-    	password = forms.CharField(widget=forms.PasswordInput)
-
-	first_name = forms.CharField(max_length=30)
-	last_name = forms.CharField(max_length=30)
-
-	email = forms.EmailField()
