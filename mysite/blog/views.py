@@ -12,7 +12,7 @@ def index(request):
 	latest_articles_list = Article.objects.all().order_by('-publication_date')[:10]
 	return render_to_response('blog/index.html', {'latest_articles_list': latest_articles_list}, context_instance=RequestContext(request))
 
-def register_user(request):
+def registerUser(request):
 	form = RegisterForm(request.POST)
 	if request.method == 'POST':	
 		login_date_time = datetime.datetime.now()
