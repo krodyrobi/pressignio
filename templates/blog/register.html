@@ -9,7 +9,14 @@
     <h1>Register</h1>
     <hr>
       <form action="/blog/register/" method="post">{% csrf_token %}
-	<div>{{ form.username.errors form.password.errors form.pass_check.errors form.email.errors form.description.errors form._all_.errors}}</div>
+        
+        {% for key, value in form.errors.items %}
+	{% if forloop.first %} 
+		<div>There have been some errors in the form you submitted have a look, please correct them.</div><br />
+	{%endif%}
+		<div style="color:red;">{{value|striptags}}</div>
+	{%endfor%}
+	<br />
         <table> 
 
         <tr>
@@ -21,7 +28,7 @@
             <td>{{ form.password }}</td>
         </tr>
         <tr>
-	    <td>Retype password:</td>
+	    <td>Re-type password:</td>
             <td>{{ form.pass_check }}</td>
         </tr>
 	<tr>
@@ -42,7 +49,7 @@
           <td><div><input type="submit" value="Register"></div></td>
         </tr>
         </table>
-      <br>
+      <br />
     <script src="http://code.jquery.com/jquery.js"></script>
     <script src="{% static "bootstrap/js/bootstrap.min.js" %}"></script>
   </body>

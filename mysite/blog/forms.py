@@ -8,13 +8,20 @@ from blog.models import Author
 
 class RegisterForm(forms.Form):
     	username = forms.CharField(max_length=30)
-    	password = forms.CharField(widget=forms.PasswordInput,min_length=6)
-	pass_check = forms.CharField(widget=forms.PasswordInput)
+    	password = forms.CharField(label="Password",widget=forms.PasswordInput,min_length=6)
+	pass_check = forms.CharField(label="Re-type password",widget=forms.PasswordInput)
 
 	author_name = forms.CharField(max_length=100)
 	author_description = forms.CharField(widget=forms.Textarea)
 
 	email = forms.EmailField()
+
+	def __init__(self, *args, **kwargs):
+        	super(RegisterForm, self).__init__(*args, **kwargs)
+
+
+		for field in self.fields.values():
+		    field.error_messages = {'required':'The field {fieldname} is required!'.format(fieldname=field.label)}
 
 
 	def clean(self):
