@@ -1,0 +1,25 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Blog Title {% block title %}{% endblock %}</title>
+    <link href="{% static "bootstrap/css/bootstrap.min.css" %}" rel="stylesheet" media="screen">
+  </head>
+  <body>
+    <div id="login">
+      {% if not user.is_authenticated %}
+      <p>Hello, Guest. <a href="/blog/login">Login</a></p>
+      {% else %}
+      <p>Hello, <a href="/blog/{{ user.author.slug }}">{{ user.author.name }}</a>.
+        <a href="/blog/logout">Logout</a>
+      </p>
+      {% endif %}
+    </div>
+    <div id="content">
+      {% block content %}
+      {% endblock %}
+    </div>
+    <script src="http://code.jquery.com/jquery.js"></script>
+    <script src="{% static "bootstrap/js/bootstrap.min.js" %}"></script>
+  </body>
+</html>
