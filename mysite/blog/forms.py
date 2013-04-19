@@ -1,6 +1,5 @@
 from django import forms
 
-import datetime		
 
 class RegisterForm(forms.Form):
     	username = forms.CharField(max_length=30)
@@ -12,6 +11,16 @@ class RegisterForm(forms.Form):
 
 	email = forms.EmailField()
 
-class LoginForm(forms.Form):
-	username = forms.CharField(max_length=30)
-	password = forms.CharField(widget=forms.PasswordInput)
+
+	def clean(self):
+		cleaned_data = self.cleaned_data
+		
+		password1 = cleaned_data.get("password")
+		password2 = cleaned_data.get("pass_check")
+
+
+		if password1 != password2:
+			raise forms.ValidationError("Passwords must be identical.")
+
+		return cleaned_data
+
