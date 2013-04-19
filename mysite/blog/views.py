@@ -3,8 +3,6 @@ from django.contrib.auth import authenticate, login, logout
 from django.shortcuts import get_object_or_404, render, render_to_response
 from django.template import RequestContext
 
-import datetime
-
 from blog.forms import LoginForm, RegisterForm
 from blog.models import Article, Author
 
@@ -16,13 +14,14 @@ def registerUser(request):
 	
 	if request.method == 'POST':	
 		form = RegisterForm(request.POST)
-		login_date_time = datetime.datetime.now()
-		
+
 		if form.is_valid():
 			data = form.cleaned_data
+			form.save()
+			
 			return render_to_response('blog/register_ok.html', {'author': data},context_instance=RequestContext(request))
 		else: 
-			return render_to_response('blog/register.html', {'form': form, 'errors': form.errors}, context_instance=RequestContext(request))
+			return render_to_response('blog/register.html', {'form': form}, context_instance=RequestContext(request))
 			
 		###### Continue form errors ###### Continue formating the html ###### check if duplicate primary keys -manage exceptions
 		###### Add first name last name and remove the required lables + print error messages ######

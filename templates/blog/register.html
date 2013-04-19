@@ -6,13 +6,43 @@
     <link href="{% static "bootstrap/css/bootstrap.min.css" %}" rel="stylesheet" media="screen">
   </head>
   <body>
+    <h1>Register</h1>
+    <hr>
+      <form action="/blog/register/" method="post">{% csrf_token %}
+	<div>{{ form.username.errors form.password.errors form.pass_check.errors form.email.errors form.description.errors form._all_.errors}}</div>
+        <table> 
 
-    <form action="/blog/register/" method="post">{% csrf_token %}
-      {{ form.as_p }}
-      <input type="submit" value="Submit" />
-    </form>
-	
-    
+        <tr>
+	    <td>Username:</td>
+            <td>{{ form.username }}</td>
+        </tr>
+        <tr>
+	    <td>Password:</div></td>
+            <td>{{ form.password }}</td>
+        </tr>
+        <tr>
+	    <td>Retype password:</td>
+            <td>{{ form.pass_check }}</td>
+        </tr>
+	<tr>
+	    <td>Email:</td>
+            <td>{{ form.email }}</td>
+        </tr>
+        <tr>
+	    <td>Author Name:</td>
+            <td>{{ form.author_name }}</td>
+        </tr>
+        <tr colspan='2' style="text-align:center;">
+	    <td>Description:</td>
+        </tr>
+        <tr colspan='2' style="align:center;">
+	    <td>{{ form.author_description }}</td>
+        </tr>
+        <tr>
+          <td><div><input type="submit" value="Register"></div></td>
+        </tr>
+        </table>
+      <br>
     <script src="http://code.jquery.com/jquery.js"></script>
     <script src="{% static "bootstrap/js/bootstrap.min.js" %}"></script>
   </body>
