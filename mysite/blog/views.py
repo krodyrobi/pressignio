@@ -1,5 +1,5 @@
 from django.contrib.auth.models import User
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
 from django.shortcuts import get_object_or_404, render, render_to_response
 from django.template import RequestContext
 
@@ -36,7 +36,7 @@ def login_user(request):
 				login(request, user)
 
 				latest_articles_list = Article.objects.all().order_by('-publication_date')[:10]
-				return render_to_response('blog/index.html', {'latest_articles_list': latest_articles_list, 'user': user})
+				return render_to_response('blog/index.html', {'latest_articles_list': latest_articles_list}, context_instance=RequestContext(request))
 
 			else:
 				return render_to_response('blog/login.html', {'is_good': False, 'form': form},
@@ -48,6 +48,13 @@ def login_user(request):
 		form = LoginForm()
 		return render_to_response('blog/login.html', {'is_good': True, 'form': form},
 			context_instance=RequestContext(request))
+
+def logout_user(request):
+	logout(request)
+
+	latest_articles_list = Article.objects.all().order_by('-publication_date')[:10]
+
+	return render_to_response('blog/index.html', {'latest_articles_list': latest_articles_list}, context_instance=RequestContext(request))
 
 def detail(request, title_slug, year, month):
 	article = get_object_or_404(Article, slug=title_slug, publication_date__year=year,
