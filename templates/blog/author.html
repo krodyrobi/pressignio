@@ -6,6 +6,11 @@
     <link href="{% static "bootstrap/css/bootstrap.min.css" %}" rel="stylesheet" media="screen">
   </head>
   <body>
+    {% if not user.is_authenticated %}
+      <p>Hello, Guest. <a href="/blog/login">Login</a></p>
+    {% else %}
+      <p>Hello, <a href="/blog/{{ user.author.slug }}">{{ user.author.name }}</a>.</p>
+    {% endif %}
     <h1>{{ author.name }}</h1>
     <p>{{ author.description|linebreaks }}</p>
      {% for article in latest_articles_list %}
