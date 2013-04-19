@@ -1,4 +1,7 @@
 from django import forms
+from django.forms import ModelForm
+
+from blog.models import Article
 
 import datetime		
 
@@ -15,3 +18,8 @@ class RegisterForm(forms.Form):
 class LoginForm(forms.Form):
 	username = forms.CharField(max_length=30)
 	password = forms.CharField(widget=forms.PasswordInput)
+
+class ArticleForm(ModelForm):
+	class Meta:
+		model = Article
+		exclude = ('slug', 'publication_date',)

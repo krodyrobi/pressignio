@@ -1,16 +1,19 @@
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
+from django.core.exceptions import ObjectDoesNotExist
+from django.http import Http404
 from django.shortcuts import get_object_or_404, render, render_to_response
 from django.template import RequestContext
 
 import datetime
 
-from blog.forms import LoginForm, RegisterForm
+from blog.forms import LoginForm, RegisterForm, ArticleForm
 from blog.models import Article, Author
 
 def index(request):
 	latest_articles_list = Article.objects.all().order_by('-publication_date')[:10]
-	return render_to_response('blog/index.html', {'latest_articles_list': latest_articles_list}, context_instance=RequestContext(request))
+	return render_to_response('blog/index.html', {'latest_articles_list': latest_articles_list}, 
+		context_instance=RequestContext(request))
 
 def register_user(request):
 	username = request.POST['username']
@@ -54,7 +57,8 @@ def logout_user(request):
 
 	latest_articles_list = Article.objects.all().order_by('-publication_date')[:10]
 
-	return render_to_response('blog/index.html', {'latest_articles_list': latest_articles_list}, context_instance=RequestContext(request))
+	return render_to_response('blog/index.html', {'latest_articles_list': latest_articles_list}, 
+		context_instance=RequestContext(request))
 
 def detail(request, title_slug, year, month):
 	article = get_object_or_404(Article, slug=title_slug, publication_date__year=year,
@@ -68,3 +72,58 @@ def author(request, name_slug):
 	return render_to_response('blog/author.html', {'author': author,
 		'latest_articles_list': latest_articles_list},
 		context_instance=RequestContext(request))
+
+def edit_account(request):
+	if request.user.is_anonymous():
+		raise Http404
+	else:
+		author = request.user.author
+		latest_articles_list = Article.objects.filter(author=author).order_by('-publication_date')[:3]
+		return render_to_response('blog/author.html', {'author': author,
+			'latest_articles_list': latest_articles_list},
+			context_instance=RequestContext(request))
+
+def edit_articles(request, page=1):
+	if request.user.is_anonymous():
+		raise Http404
+	else:
+		author = request.user.author
+		latest_articles_list = Article.objects.filter(author=author).order_by('-publication_date')[5 * (int(page) - 1) : 5 * int(page)]
+		last = Article.objects.filter(author=author).count() <= 5 * int(page)
+		return render_to_response('blog/edit_articles.html', {'latest_articles_list': latest_articles_list,
+			'page': int(page), 'last': last}, context_instance=RequestContext(request))
+
+def edit_one_article(request, article_pk=0):
+	if request.method == 'POST':
+		form = ArticleForm(request.POST)
+		is_good = False
+
+		try:
+			if form.is_valid():
+				article = Article.objects.get(pk=article_pk)
+				is_good = True
+
+				art = form.save(commit=False)
+				art.publication_date = datetime.datetime.now()
+				art.save(article)
+
+			return render_to_response('blog/edit_one_article.html', {'article_pk': article_pk, 'form': form}, 
+				context_instance=RequestContext(request))
+		except ObjectDoesNotExist:
+			if form.is_valid():
+				art = form.save(commit=False)
+				art.publication_date = datetime.datetime.now()
+				art.save()
+
+			return render_to_response('blog/edit_one_article.html', {'article_pk': article_pk, 'form': form}, 
+				context_instance=RequestContext(request))
+	else:
+		try:
+			article = Article.objects.get(pk=article_pk)
+
+			form = ArticleForm(instance=article)
+		except ObjectDoesNotExist:
+			form = ArticleForm(request.POST)
+
+		return render_to_response('blog/edit_one_article.html', {'article_pk': article_pk, 'form': form}, 
+			context_instance=RequestContext(request))
