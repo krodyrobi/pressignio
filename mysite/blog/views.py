@@ -23,8 +23,7 @@ def registerUser(request):
 		else: 
 			return render_to_response('blog/register.html', {'form': form}, context_instance=RequestContext(request))
 			
-		###### Continue form errors ###### Continue formating the html ###### check if duplicate primary keys -manage exceptions
-		###### Add first name last name and remove the required lables + print error messages ######
+		#######FINISH email registration #########
 	else:
 		form = RegisterForm()
 		return render_to_response('blog/register.html', {'form': form}, context_instance=RequestContext(request))
