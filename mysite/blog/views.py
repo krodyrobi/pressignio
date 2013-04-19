@@ -11,25 +11,23 @@ from blog.models import Article, Author
 def index(request):
 	latest_articles_list = Article.objects.all().order_by('-publication_date')[:10]
 	return render_to_response('blog/index.html', {'latest_articles_list': latest_articles_list}, context_instance=RequestContext(request))
-
+		
 def registerUser(request):
-	form = RegisterForm(request.POST)
+	
 	if request.method == 'POST':	
+		form = RegisterForm(request.POST)
 		login_date_time = datetime.datetime.now()
 		
 		if form.is_valid():
 			data = form.cleaned_data
-			user = User.objects.create_user(data['username'], data['email'], data['password'])
-			author = Author(user = user, name = data['author_name'], description = data['author_description'])
-			author.save() 
 			return render_to_response('blog/register_ok.html', {'author': data},context_instance=RequestContext(request))
-
 		else: 
-			return HttpResponse("error form is invalid", content_type="text/plain")
+			return render_to_response('blog/register.html', {'form': form, 'errors': form.errors}, context_instance=RequestContext(request))
 			
 		###### Continue form errors ###### Continue formating the html ###### check if duplicate primary keys -manage exceptions
 		###### Add first name last name and remove the required lables + print error messages ######
 	else:
+		form = RegisterForm()
 		return render_to_response('blog/register.html', {'form': form}, context_instance=RequestContext(request))
 
 def login_user(request):

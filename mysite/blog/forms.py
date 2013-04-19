@@ -1,6 +1,10 @@
+from django.core.exceptions import ObjectDoesNotExist
+from django.contrib.auth.models import User
 from django import forms
 
-import datetime		
+import datetime	
+
+from blog.models import Author	
 
 class RegisterForm(forms.Form):
     	username = forms.CharField(max_length=30)
@@ -21,7 +25,24 @@ class RegisterForm(forms.Form):
 
 
 		if password1 != password2:
-			raise forms.ValidationError("Passwords must be identical.")
+			raise forms.ValidationError("Passwords must be identical!")
+		
+		if len(password1) < 6 :
+			raise forms.ValidationError("Password must be at least 6 characters long!")
+		
+		try:
+			check = User.objects.get(username=cleaned_data['username'])
+
+		except ObjectDoesNotExist:
+
+			user = User.objects.create_user(cleaned_data['username'], cleaned_data['email'], cleaned_data['password'])
+			user.is_active = False
+			author = Author(user = user, name = cleaned_data['author_name'], description = cleaned_data['author_description'])
+			user.save()
+			author.save()
+
+		else:
+			raise forms.ValidationError("Username already exists, please choose another one!")
 
 		return cleaned_data
 
