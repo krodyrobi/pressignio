@@ -13,17 +13,24 @@ def index(request):
 	return render_to_response('blog/index.html', {'latest_articles_list': latest_articles_list}, context_instance=RequestContext(request))
 
 def register_user(request):
-	username = request.POST['username']
-	password = request.POST['password']
-	pass_check = request.POST['pass_check']
-	author_name = request.POST['author_name']
+	form = RegisterForm(request.POST)
+	if request.method == 'POST':	
+		login_date_time = datetime.datetime.now()
+		
+		if form.is_valid():
+			data = form.cleaned_data
+			user = User.objects.create_user(data['username'], data['email'], data['password'])
+			author = Author(user = user, name = data['author_name'], description = data['author_description'])
+			author.save() 
+			return render_to_response('blog/register_ok.html', {'author': data},context_instance=RequestContext(request))
 
-	email = request.POST['email']
-
-	login_date_time = datetime.datetime.now()
-
-	user = Users.object.create_user('', '', '')
-	user.save()
+		else: 
+			return HttpResponse("error form is invalid", content_type="text/plain")
+			
+		###### Continue form errors ###### Continue formating the html ###### check if duplicate primary keys -manage exceptions
+		###### Add first name last name and remove the required lables + print error messages ######
+	else:
+		return render_to_response('blog/register.html', {'form': form}, context_instance=RequestContext(request))
 
 def login_user(request):
 	if request.method == 'POST':
