@@ -1,0 +1,37 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Blog Title</title>
+    <link href="{% static "bootstrap/css/bootstrap.min.css" %}" rel="stylesheet" media="screen">
+  </head>
+  <body style="text-align:center;">
+    <h1>Hello, {{ author.author_name }}!</h1>
+    <hr>
+    <div style="width:100%">
+      <table style="margin-left:auto,margin-right:auto;">
+      <tr colspan='2'>
+	  <td><div>You have created an account with the details:</div></td>
+      </tr>
+      <tr>
+	  <td><div>Username:</div></td>
+          <td><div>{{ author.username }}</div></td>
+      </tr>
+      <tr>
+	  <td><div>Password:</div></td>
+          <td><div>{{ author.password }}</div></td>
+      </tr>
+      <tr colspan='2' style="text-align:center;">
+	  <td><div>Description:</div></td>
+      </tr>
+      <tr colspan='2' style="align:center;">
+	  <td><textarea rows="4" cols="50" readonly>{{ author.author_description|linebreaks }}</textarea></td>
+      </tr>
+      </table>
+      <br>
+      <h4>Please check your email ({{ author.email }}) for completing the registration process! </h4>
+    </div>
+    <script src="http://code.jquery.com/jquery.js"></script>
+    <script src="{% static "bootstrap/js/bootstrap.min.js" %}"></script>
+  </body>
+</html>
