@@ -35,7 +35,7 @@ def registerUser(request):
 		return render_to_response('blog/register.html', {'form': form}, context_instance=RequestContext(request))
 
 def confirm(request, username, confirmation_code):
-	if request.method == 'GET':	
+	if request.method == 'GET':
 
 		try:
 			user = User.objects.get(username = username, author__confirmation_code = confirmation_code, is_active = False)

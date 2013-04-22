@@ -13,8 +13,8 @@ import random
 from blog.models import Author	
 
 class RegisterForm(forms.Form):
-    	username = forms.CharField(max_length=30)
-    	password = forms.CharField(label="Password",widget=forms.PasswordInput,min_length=6)
+	username = forms.CharField(max_length=30)
+	password = forms.CharField(label="Password",widget=forms.PasswordInput,min_length=6)
 	pass_check = forms.CharField(label="Re-type password",widget=forms.PasswordInput)
 
 	author_name = forms.CharField(max_length=100)
@@ -23,7 +23,7 @@ class RegisterForm(forms.Form):
 	email = forms.EmailField()
 
 	def __init__(self, *args, **kwargs):
-        	super(RegisterForm, self).__init__(*args, **kwargs)
+		super(RegisterForm, self).__init__(*args, **kwargs)
 
 
 		for field in self.fields.values():
