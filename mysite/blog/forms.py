@@ -75,8 +75,47 @@ class RegisterForm(forms.Form):
 
 		title = "Pressignio account confirmation:"
 		content = "localhost:8000/blog/confirm/" + str(author.confirmation_code) + "/" + user.username
-		send_mail(title, content, 'pressignio-bot@presslabs.com', [user.email], fail_silently=False)		
-	
+		send_mail(title, content, 'pressignio-bot@presslabs.com', [user.email], fail_silently=False)
+
+class AccountForm(ModelForm):
+	class Meta:
+		model = User
+		exclude = ('username', 'password', 'first_name', 'last_name', 'is_staff', 'is_active', 'is_superuser', 'last_login', 'date_joined',
+			'groups', 'user_permissions')
+
+		fields = ['passw', 'pass_check', 'email', 'author_name', 'author_description']	
+
+	passw = forms.CharField(label='Password',widget=forms.PasswordInput,min_length=6)
+	pass_check = forms.CharField(label='Re-type password',widget=forms.PasswordInput)
+	author_name = forms.CharField(max_length=100)
+	author_description = forms.CharField(label='Description',widget=forms.Textarea)
+
+	def clean(self):
+		cleaned_data = super(AccountForm, self).clean()
+
+		if len(cleaned_data['passw']) < 6:
+			raise forms.ValidationError('Password must be at least 6 characters long.')
+
+		password1 = cleaned_data['passw']
+		password2 = cleaned_data['pass_check']
+
+		if password1 != password2:
+			raise forms.ValidationError('Passwords must match!')
+
+		return cleaned_data
+
+	def save(self):
+		instance = super(AccountForm, self).save(self)
+
+		cleaned_data = self.cleaned_data
+
+		instance.set_password(cleaned_data['passw'])
+
+		instance.author.name = cleaned_data['author_name']
+		instance.author.description = cleaned_data['author_description']
+
+		instance.save()
+
 class LoginForm(forms.Form):
 	username = forms.CharField(max_length=30)
 	password = forms.CharField(widget=forms.PasswordInput)
@@ -85,7 +124,7 @@ class ArticleForm(ModelForm):
 	class Meta:
 		model = Article
 		exclude = ('slug', 'publication_date', 'author')
-
+		
 class EditForm(forms.Form):
 	pk = forms.IntegerField()
 

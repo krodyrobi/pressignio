@@ -7,7 +7,7 @@ from django.shortcuts import get_object_or_404, render, render_to_response, redi
 from django.template import RequestContext
 from django.core.urlresolvers import reverse
 
-from blog.forms import LoginForm, RegisterForm, ArticleForm, EditForm, DeleteForm
+from blog.forms import LoginForm, RegisterForm, ArticleForm, EditForm, DeleteForm, AccountForm
 from blog.models import Article, Author
 
 import datetime
@@ -92,14 +92,30 @@ def author(request, name_slug):
 		context_instance=RequestContext(request))
 
 def edit_account(request):
+	is_good = False
+
 	if request.user.is_anonymous():
 		raise Http404
 	else:
-		author = request.user.author
-		latest_articles_list = Article.objects.filter(author=author).order_by('-publication_date')[:3]
-		return render_to_response('blog/author.html', {'author': author,
-			'latest_articles_list': latest_articles_list},
-			context_instance=RequestContext(request))
+		
+		user = request.user
+
+		if request.method == 'POST':
+			form = AccountForm(request.POST, instance=user)
+
+			if form.is_valid():
+				is_good = True
+
+				form.save()
+
+				return render_to_response('blog/edit_account.html', {'is_good': is_good, 'form': form},
+					context_instance=RequestContext(request))
+		else:
+			form = AccountForm(instance=user, initial={'author_name': user.author.name,
+				'author_description': user.author.description})
+
+			return render_to_response('blog/edit_account.html', {'is_good': is_good, 'form': form},
+					context_instance=RequestContext(request))
 
 def edit_articles(request, page=1):
 	if request.user.is_anonymous():
