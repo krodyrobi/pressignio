@@ -1,33 +1,54 @@
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
+from django.core.urlresolvers import reverse
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import Http404
 from django.shortcuts import get_object_or_404, render, render_to_response, redirect
 from django.template import RequestContext
 from django.core.urlresolvers import reverse
 
-import datetime
-
 from blog.forms import LoginForm, RegisterForm, ArticleForm, EditForm, DeleteForm
 from blog.models import Article, Author
 
+import datetime
+
 def index(request):
 	latest_articles_list = Article.objects.all().order_by('-publication_date')[:10]
-	return render_to_response('blog/index.html', {'latest_articles_list': latest_articles_list}, 
-		context_instance=RequestContext(request))
+	return render_to_response('blog/index.html', {'latest_articles_list': latest_articles_list}, context_instance=RequestContext(request))
+		
+def registerUser(request):
+	
+	if request.method == 'POST':	
+		form = RegisterForm(request.POST)
 
-def register_user(request):
-	username = request.POST['username']
-	password = request.POST['password']
-	pass_check = request.POST['pass_check']
-	author_name = request.POST['author_name']
+		if form.is_valid():
+			data = form.cleaned_data
+			user , author = form.save()
+			form.sendValidationEmail(user,author)	
+						
+			return render_to_response('blog/register_ok.html', {'author': data},context_instance=RequestContext(request))
+		else: 
+			return render_to_response('blog/register.html', {'form': form}, context_instance=RequestContext(request))
+			
+	else:
+		form = RegisterForm()
+		return render_to_response('blog/register.html', {'form': form}, context_instance=RequestContext(request))
 
-	email = request.POST['email']
+def confirm(request, username, confirmation_code):
+	if request.method == 'GET':	
 
-	login_date_time = datetime.datetime.now()
+		try:
+			user = User.objects.get(username = username, author__confirmation_code = confirmation_code, is_active = False)
+		except ObjectDoesNotExist:
+			raise Http404
 
-	user = Users.object.create_user('', '', '')
-	user.save()
+		user.is_active = True
+		user.save()
+
+		return redirect(reverse('index'))
+				
+	else:
+		return redirect(reverse('index'))
 
 def login_user(request):
 	if request.method == 'POST':
@@ -153,6 +174,7 @@ def edit_one_article(request, article_pk=0):
 
 					art = form.save(commit=False)
 					art.publication_date = datetime.datetime.now()
+					art.author = request.user.author
 					art.save()
 
 				return render_to_response('blog/edit_one_article.html', {'article_pk': article_pk, 'form': form, 'is_good': is_good}, 
@@ -165,6 +187,7 @@ def edit_one_article(request, article_pk=0):
 
 					art = form.save(commit=False)
 					art.publication_date = datetime.datetime.now()
+					art.author = request.user.author
 					art.save()
 					article_pk = art.pk
 

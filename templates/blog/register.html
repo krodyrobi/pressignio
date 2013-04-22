@@ -1,0 +1,51 @@
+{% extends "blog/base.html" %}
+
+{% block title %} - Register{% endblock %}
+
+{% block login %}{% endblock %}
+
+{% block content %}
+  <h1>Register</h1>
+  <hr>
+    <form action="/blog/register/" method="post">{% csrf_token %}
+      
+      {% for key, value in form.errors.items %}
+        {% if forloop.first %} 
+        <div>There have been some errors in the form you submitted have a look, please correct them.</div><br />
+        {% endif %}
+        <div style="color:red;">{{ value|striptags }}</div>
+      {% endfor %}
+    <br />
+    <table> 
+      <tr>
+        <td>Username:</td>
+        <td>{{ form.username }}</td>
+      </tr>
+      <tr>
+	<td>Password:</div></td>
+        <td>{{ form.password }}</td>
+      </tr>
+      <tr>
+	<td>Re-type password:</td>
+        <td>{{ form.pass_check }}</td>
+      </tr>
+      <tr>
+	<td>Email:</td>
+        <td>{{ form.email }}</td>
+      </tr>
+      <tr>
+	<td>Author Name:</td>
+        <td>{{ form.author_name }}</td>
+      </tr>
+      <tr colspan='2' style="text-align:center;">
+        <td>Description:</td>
+      </tr>
+      <tr colspan='2' style="align:center;">
+	<td>{{ form.author_description }}</td>
+      </tr>
+      <tr>
+        <td><div><input type="submit" value="Register"></div></td>
+      </tr>
+    </table>
+    <br />
+{% endblock %}
