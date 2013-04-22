@@ -2,6 +2,9 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.core.mail import send_mail
 from django.contrib.auth.models import User
 from django import forms
+from django.forms import ModelForm
+
+from blog.models import Article
 
 import string 
 import datetime
@@ -72,11 +75,20 @@ class RegisterForm(forms.Form):
 
 		title = "Pressignio account confirmation:"
 		content = "localhost:8000/blog/confirm/" + str(author.confirmation_code) + "/" + user.username
-		send_mail(title, content, 'pressignio-bot@presslabs.com', [user.email], fail_silently=False)
-
-		
-		
+		send_mail(title, content, 'pressignio-bot@presslabs.com', [user.email], fail_silently=False)		
 	
 class LoginForm(forms.Form):
 	username = forms.CharField(max_length=30)
 	password = forms.CharField(widget=forms.PasswordInput)
+
+class ArticleForm(ModelForm):
+	class Meta:
+		model = Article
+		exclude = ('slug', 'publication_date', 'author')
+
+class EditForm(forms.Form):
+	pk = forms.IntegerField()
+
+class DeleteForm(forms.Form):
+	pk = forms.IntegerField()
+	page = forms.IntegerField()
