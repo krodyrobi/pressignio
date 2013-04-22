@@ -14,9 +14,22 @@
 {% endblock %}
 
 {% block content %}
+   <form action="/blog/myarticles/edit/" method="post">{% csrf_token %}
+  <input for="id_pk" type="hidden" name="pk" value="0" />
+  <input type="submit" value="New"/>
+  </form>
   {% for article in latest_articles_list %}
-  <h2>{{ article.title }} - <a href="/blog/myarticles/edit/{{ article.pk }}">Edit</a></h2>
+  <h2>{{ article.title }}</h2>
   <h3><a href="/blog/{{ article.author.slug }}">{{ article.author }}</a>  -  {{ article.publication_date }}</h3>
+  <form action="/blog/myarticles/edit/" method="post">{% csrf_token %}
+  <input for="id_pk" type="hidden" name="pk" value="{{ article.pk }}" />
+  <input type="submit" value="Edit"/>
+  </form>
+  <form action="/blog/myarticles/delete/" method="post">{% csrf_token %}
+  <input for="id_pk" type="hidden" name="pk" value="{{ article.pk }}" />
+  <input for="id_page" type="hidden" name="page" value="{{ page }}" />
+  <input type="submit" value="Delete"/>
+  </form>
   <p>{{ article.text|linebreaks|truncatewords:180 }}</p>
   {% endfor %}
   {% if page == 1 %}

@@ -2,12 +2,13 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import Http404
-from django.shortcuts import get_object_or_404, render, render_to_response
+from django.shortcuts import get_object_or_404, render, render_to_response, redirect
 from django.template import RequestContext
+from django.core.urlresolvers import reverse
 
 import datetime
 
-from blog.forms import LoginForm, RegisterForm, ArticleForm
+from blog.forms import LoginForm, RegisterForm, ArticleForm, EditForm, DeleteForm
 from blog.models import Article, Author
 
 def index(request):
@@ -38,8 +39,7 @@ def login_user(request):
 			if user is not None:
 				login(request, user)
 
-				latest_articles_list = Article.objects.all().order_by('-publication_date')[:10]
-				return render_to_response('blog/index.html', {'latest_articles_list': latest_articles_list}, context_instance=RequestContext(request))
+				return redirect(reverse('index'))
 
 			else:
 				return render_to_response('blog/login.html', {'is_good': False, 'form': form},
@@ -55,10 +55,7 @@ def login_user(request):
 def logout_user(request):
 	logout(request)
 
-	latest_articles_list = Article.objects.all().order_by('-publication_date')[:10]
-
-	return render_to_response('blog/index.html', {'latest_articles_list': latest_articles_list}, 
-		context_instance=RequestContext(request))
+	return redirect(reverse('index'))
 
 def detail(request, title_slug, year, month):
 	article = get_object_or_404(Article, slug=title_slug, publication_date__year=year,
@@ -93,37 +90,93 @@ def edit_articles(request, page=1):
 		return render_to_response('blog/edit_articles.html', {'latest_articles_list': latest_articles_list,
 			'page': int(page), 'last': last}, context_instance=RequestContext(request))
 
-def edit_one_article(request, article_pk=0):
-	if request.method == 'POST':
-		form = ArticleForm(request.POST)
-		is_good = False
-
-		try:
-			if form.is_valid():
-				article = Article.objects.get(pk=article_pk)
-				is_good = True
-
-				art = form.save(commit=False)
-				art.publication_date = datetime.datetime.now()
-				art.save(article)
-
-			return render_to_response('blog/edit_one_article.html', {'article_pk': article_pk, 'form': form}, 
-				context_instance=RequestContext(request))
-		except ObjectDoesNotExist:
-			if form.is_valid():
-				art = form.save(commit=False)
-				art.publication_date = datetime.datetime.now()
-				art.save()
-
-			return render_to_response('blog/edit_one_article.html', {'article_pk': article_pk, 'form': form}, 
-				context_instance=RequestContext(request))
+def edit(request):
+	if request.user.is_anonymous():
+		raise Http404
 	else:
-		try:
-			article = Article.objects.get(pk=article_pk)
+		if request.method == 'POST':
+			form = EditForm(request.POST)
 
-			form = ArticleForm(instance=article)
-		except ObjectDoesNotExist:
-			form = ArticleForm(request.POST)
+			if form.is_valid():
+				try:
+					article_pk = form.cleaned_data['pk']
 
-		return render_to_response('blog/edit_one_article.html', {'article_pk': article_pk, 'form': form}, 
-			context_instance=RequestContext(request))
+					article = Article.objects.get(pk=article_pk)
+					form = ArticleForm(instance=article)
+
+					return render_to_response('blog/edit_one_article.html', {'article_pk': article_pk, 'form': form, 'is_good': False}, 
+					context_instance=RequestContext(request))
+				except ObjectDoesNotExist:
+					return edit_one_article(request)
+
+			else:
+				raise Http404
+		else:
+			raise Http404
+
+def delete(request):
+	if request.user.is_anonymous():
+		raise Http404
+	else:
+		if request.method == 'POST':
+			form = DeleteForm(request.POST)
+
+			if form.is_valid():
+				try:
+					article_pk = form.cleaned_data['pk']
+
+					article = Article.objects.get(pk=article_pk)
+					article.delete()
+				except ObjectDoesNotExist:
+					raise Http404
+
+				return redirect(reverse('edit_articles', args=(form.cleaned_data['page'],)))
+
+			else:
+				raise Http404
+		else:
+			raise Http404
+
+def edit_one_article(request, article_pk=0):
+	is_good = False
+
+	if request.user.is_anonymous():
+		raise Http404
+	else:
+		if request.method == 'POST':
+			try:
+				article = Article.objects.get(pk=article_pk)
+				form = ArticleForm(request.POST, instance=article)
+
+				if form.is_valid():
+					is_good = True
+
+					art = form.save(commit=False)
+					art.publication_date = datetime.datetime.now()
+					art.save()
+
+				return render_to_response('blog/edit_one_article.html', {'article_pk': article_pk, 'form': form, 'is_good': is_good}, 
+					context_instance=RequestContext(request))
+			except ObjectDoesNotExist:
+				form = ArticleForm(request.POST)
+
+				if form.is_valid():
+					is_good = True
+
+					art = form.save(commit=False)
+					art.publication_date = datetime.datetime.now()
+					art.save()
+					article_pk = art.pk
+
+				return render_to_response('blog/edit_one_article.html', {'article_pk': article_pk, 'form': form, 'is_good': is_good}, 
+					context_instance=RequestContext(request))
+		else:
+			try:
+				article = Article.objects.get(pk=article_pk)
+
+				form = ArticleForm(instance=article)
+			except ObjectDoesNotExist:
+				form = ArticleForm(request.POST)
+
+			return render_to_response('blog/edit_one_article.html', {'article_pk': article_pk, 'form': form, 'is_good': is_good}, 
+				context_instance=RequestContext(request))

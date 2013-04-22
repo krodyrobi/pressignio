@@ -23,3 +23,10 @@ class ArticleForm(ModelForm):
 	class Meta:
 		model = Article
 		exclude = ('slug', 'publication_date',)
+
+class EditForm(forms.Form):
+	pk = forms.IntegerField()
+
+class DeleteForm(forms.Form):
+	pk = forms.IntegerField()
+	page = forms.IntegerField()
