@@ -8,5 +8,6 @@ urlpatterns = patterns('',
 	url(r'^login/$', views.login_user, name='login_user'),
 	url(r'^logout/$', views.logout_user, name='logout_user'),
 	url(r'^register/$', views.registerUser, name='registerUser'),
+	url(r'^confirm/(?P<confirmation_code>[-\w]+)/(?P<username>[-\w]+)/$', views.confirm, name='confirm'),
 	url(r'^(?P<name_slug>[-\w]+)/$', views.author, name='author'),
 )

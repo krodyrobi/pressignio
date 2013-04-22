@@ -7,6 +7,15 @@ ADMINS = (
     # ('Your Name', 'your_email@example.com'),
 )
 
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+EMAIL_HOST = 'localhost'
+EMAIL_PORT = 587
+EMAIL_HOST_PASSWORD = ''
+EMAIL_HOST_USER = ''
+EMAIL_SUBJECT_PREFIX = 'django'
+EMAIL_USE_TLS = True
+
 MANAGERS = ADMINS
 
 DATABASES = {

@@ -25,7 +25,7 @@
 	  <td><div>Description:</div></td>
       </tr>
       <tr colspan='2'>
-	  <td><textarea rows="4" cols="50" readonly>{{ author.author_description|linebreaks }}</textarea></td>
+	  <td><textarea rows="4" cols="50" readonly>{{ author.author_description|linebreaks|striptags }}</textarea></td>
       </tr>
       </table>
       <br>

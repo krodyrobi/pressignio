@@ -1,6 +1,8 @@
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
-from django.shortcuts import get_object_or_404, render, render_to_response
+from django.core.urlresolvers import reverse
+from django.core.exceptions import ObjectDoesNotExist
+from django.shortcuts import get_object_or_404, render, render_to_response, redirect
 from django.template import RequestContext
 
 from blog.forms import LoginForm, RegisterForm
@@ -17,8 +19,9 @@ def registerUser(request):
 
 		if form.is_valid():
 			data = form.cleaned_data
-			form.save()
-			
+			user , author = form.save()
+			form.sendValidationEmail(user,author)	
+						
 			return render_to_response('blog/register_ok.html', {'author': data},context_instance=RequestContext(request))
 		else: 
 			return render_to_response('blog/register.html', {'form': form}, context_instance=RequestContext(request))
@@ -27,6 +30,36 @@ def registerUser(request):
 	else:
 		form = RegisterForm()
 		return render_to_response('blog/register.html', {'form': form}, context_instance=RequestContext(request))
+
+def confirm(request, username, confirmation_code):
+	if request.method == 'GET':	
+
+		try:
+			user = User.objects.get(username = username, author__confirmation_code = confirmation_code, is_active = False)
+		except ObjectDoesNotExist:
+			raise Http404
+
+		user.is_active = True
+		user.save()
+
+		return redirect(reverse('index'))
+				
+	else:
+		return redirect(reverse('index'))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 def login_user(request):
 	if request.method == 'POST':

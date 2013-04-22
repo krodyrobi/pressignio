@@ -1,8 +1,11 @@
 from django.core.exceptions import ObjectDoesNotExist
+from django.core.mail import send_mail
 from django.contrib.auth.models import User
 from django import forms
 
-import datetime	
+import string 
+import datetime
+import random
 
 from blog.models import Author	
 
@@ -12,7 +15,7 @@ class RegisterForm(forms.Form):
 	pass_check = forms.CharField(label="Re-type password",widget=forms.PasswordInput)
 
 	author_name = forms.CharField(max_length=100)
-	author_description = forms.CharField(widget=forms.Textarea)
+	author_description = forms.CharField(label="Description",widget=forms.Textarea)
 
 	email = forms.EmailField()
 
@@ -34,22 +37,44 @@ class RegisterForm(forms.Form):
 			pass
 		else:
 			raise forms.ValidationError("Username already exists, please choose another one!")
-
+		
+		try:
+			check = User.objects.get(email=cleaned_data['email'])
+		except ObjectDoesNotExist:
+			pass
+		else:
+			raise forms.ValidationError("Email already taken, please choose another one!")
 		
 		password1 = cleaned_data.get("password")
 		password2 = cleaned_data.get("pass_check")
+
 		if password1 != password2:
 			raise forms.ValidationError("Passwords must match!")
+		
+	
 		return cleaned_data
 
 	def save(self):
 		cleaned_data = self.cleaned_data
 		
-		user = User.objects.create_user(cleaned_data['username'], cleaned_data['email'], cleaned_data['password'])
+		user = User.objects.create_user(username = cleaned_data['username'], email = cleaned_data['email'], password = cleaned_data['password'])
 		user.is_active = False
-		author = Author(user = user, name = cleaned_data['author_name'], description = cleaned_data['author_description'])
+		
+		code = ''.join(random.choice(string.ascii_uppercase + string.digits + string.ascii_lowercase) for x in range(35))
+		author = Author(user = user, name = cleaned_data['author_name'], description = cleaned_data['author_description'], confirmation_code = code)
 		user.save()
 		author.save()
+
+		return user,author
+
+		
+	def sendValidationEmail(self , user, author):
+
+		title = "Pressignio account confirmation:"
+		content = "localhost:8000/blog/confirm/" + str(author.confirmation_code) + "/" + user.username
+		send_mail(title, content, 'pressignio-bot@presslabs.com', [user.email], fail_silently=False)
+
+		
 		
 	
 class LoginForm(forms.Form):
