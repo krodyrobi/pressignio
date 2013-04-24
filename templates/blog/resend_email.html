@@ -1,0 +1,15 @@
+{% extends "blog/base.html" %}
+
+{% block title %} - Resend email validation{% endblock %}
+
+
+{% block content %}
+  {% if is_good %}
+    <h1>An email has been sent to that email address.</h1> 
+  {% endif %}
+
+  <form action="/blog/resend/" method="post">{% csrf_token %}
+    {{ form.as_p }}
+    <input type="submit" value="Resend">
+  </form>
+{% endblock %}

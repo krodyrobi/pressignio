@@ -2,15 +2,30 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.core.mail import send_mail
 from django.contrib.auth.models import User
 from django import forms
-from django.forms import ModelForm
+from django.forms import ModelForm, ValidationError
+from django.forms.util import ErrorList
 
-from blog.models import Article
+from blog.models import Article, Author
 
 import string 
 import datetime
 import random
 
-from blog.models import Author	
+
+def sendValidationEmail(user, author):
+
+	title = "Pressignio account confirmation:"
+	content = "localhost:8000/blog/confirm/" + str(author.confirmation_code) + "/" + user.username
+	send_mail(title, content, 'pressignio-bot@presslabs.com', [user.email], fail_silently=False)
+	
+def sendRetrievePasswordEmail(user):
+	password = ''.join(random.choice(string.ascii_uppercase + string.digits + string.ascii_lowercase) for x in range(6))
+	user.set_password(password)
+	user.save()
+	
+	title = "Pressignio account password:"
+	content = "Username:%s\n Password:%s" % (user.username, password)
+	send_mail(title, content, 'pressignio-bot@presslabs.com', [user.email], fail_silently=False)
 
 class RegisterForm(forms.Form):
 	username = forms.CharField(max_length=30)
@@ -70,12 +85,36 @@ class RegisterForm(forms.Form):
 
 		return user,author
 
-		
-	def sendValidationEmail(self , user, author):
 
-		title = "Pressignio account confirmation:"
-		content = "localhost:8000/blog/confirm/" + str(author.confirmation_code) + "/" + user.username
-		send_mail(title, content, 'pressignio-bot@presslabs.com', [user.email], fail_silently=False)
+class EmailResendForm(forms.Form):
+	email = forms.EmailField()
+
+	def clean_email(self):
+		email = self.cleaned_data['email']
+		try:
+			check = Author.objects.get(user__email=email, user__is_active=False)
+		except ObjectDoesNotExist:
+			raise ValidationError('Email not found or user already active!')
+		return email
+    	
+	def resend(self, user, author):
+		sendValidationEmail(user,author)
+		
+class RetrievePasswordForm(forms.Form):
+	username = forms.CharField(max_length=30, label= "Username")
+	email = forms.EmailField(label = "Email")
+	
+	def clean(self):
+		cleaned_data = super(RetrievePasswordForm, self).clean()
+		try:
+			check = User.objects.get(email=cleaned_data['email'], username=cleaned_data['username'])
+		except ObjectDoesNotExist:
+			raise ValidationError('Username and email pair does not match!')
+		return cleaned_data
+		
+	def send(self,user):
+		sendRetrievePasswordEmail(user)
+
 
 class AccountForm(ModelForm):
 	class Meta:
