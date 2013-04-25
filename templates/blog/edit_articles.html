@@ -1,35 +1,57 @@
 {% extends "blog/base.html" %}
 
+{% block articles_link %} class="active"{% endblock %}
+
 {% block title %} - My articles{% endblock %}
 
-{% block login %}
-  {% if not user.is_authenticated %}
-  <p>Hello, Guest. <a href="/blog/login">Login</a></p>
-  {% else %}
-  <p>Hello, <a href="/blog/{{ user.author.slug }}">{{ user.author.name }}</a>.
-    <a href="/blog/myaccount">My account</a>  My articles
-    <a href="/blog/logout">Logout</a>
-  </p>
-  {% endif %}
-{% endblock %}
-
 {% block content %}
-   <form action="/blog/myarticles/edit/" method="post">{% csrf_token %}
-  <input for="id_pk" type="hidden" name="pk" value="0" />
-  <input type="submit" value="New"/>
+  <form action="/blog/myarticles/edit/" method="post">{% csrf_token %}
+    <input for="id_pk" type="hidden" name="pk" value="0" />
+    <button type="submit" class="btn btn-primary">New Article</button>
   </form>
   {% for article in latest_articles_list %}
+  <div id="deleteModal" class="modal hide fade">
+    <div class="modal-header">
+      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+      <h3>Confirm</h3>
+    </div>
+    <div class="modal-body">
+      <p>Are you sure you want to delete the article?</p>
+    </div>
+    <div class="modal-footer">
+      <ul class="inline">
+        <li>
+          <form action="/blog/myarticles/delete/" method="post">{% csrf_token %}
+            <input for="id_pk" type="hidden" name="pk" value="{{ article.pk }}" />
+            <input for="id_page" type="hidden" name="page" value="{{ page }}" />
+            <input type="submit" class="btn btn-danger" value="Yes"></input>
+          </form>
+        </li>
+        <li>
+          <button class="btn" data-dismiss="modal" aria-hidden="true">No</button>
+        </li>
+      </ul>
+    </div>
+  </div>
   <h2>{{ article.title }}</h2>
-  <h3><a href="/blog/{{ article.author.slug }}">{{ article.author }}</a>  -  {{ article.publication_date }}</h3>
-  <form action="/blog/myarticles/edit/" method="post">{% csrf_token %}
-  <input for="id_pk" type="hidden" name="pk" value="{{ article.pk }}" />
-  <input type="submit" value="Edit"/>
-  </form>
-  <form action="/blog/myarticles/delete/" method="post">{% csrf_token %}
-  <input for="id_pk" type="hidden" name="pk" value="{{ article.pk }}" />
-  <input for="id_page" type="hidden" name="page" value="{{ page }}" />
-  <input type="submit" value="Delete"/>
-  </form>
+  <ul class="inline">
+    <li><h3><a href="/blog/{{ article.author.slug }}">{{ article.author }}</a>  -  {{ article.publication_date }}</h3></li>
+    <li>
+      <form action="/blog/myarticles/edit/" method="post">{% csrf_token %}
+        <input for="id_pk" type="hidden" name="pk" value="{{ article.pk }}" />
+        <button type="submit" class="btn btn-info">Edit</button>
+      </form>
+    </li>
+    <li>
+    </li>
+    <li>
+      <form action="/blog/myarticles/delete/" method="post">{% csrf_token %}
+        <input for="id_pk" type="hidden" name="pk" value="{{ article.pk }}" />
+        <input for="id_page" type="hidden" name="page" value="{{ page }}" />
+        <input type="submit" class="btn btn-danger" data-toggle="modal" data-target="#deleteModal" value="Delete"></input>
+      </form>
+    </li>
+  </ul>
   <p>{{ article.text|linebreaks|truncatewords:180 }}</p>
   {% endfor %}
   {% if page == 1 %}

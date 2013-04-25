@@ -183,6 +183,7 @@ def edit_one_article(request, article_pk=0):
 		if request.method == 'POST':
 			try:
 				article = Article.objects.get(pk=article_pk)
+
 				form = ArticleForm(request.POST, instance=article)
 
 				if form.is_valid():
@@ -196,18 +197,11 @@ def edit_one_article(request, article_pk=0):
 				return render_to_response('blog/edit_one_article.html', {'article_pk': article_pk, 'form': form, 'is_good': is_good}, 
 					context_instance=RequestContext(request))
 			except ObjectDoesNotExist:
-				form = ArticleForm(request.POST)
+				instance=Article(title='', text='', author=request.user.author, publication_date=datetime.datetime.now())
+				instance.save()
+				form = ArticleForm(instance=Article())
 
-				if form.is_valid():
-					is_good = True
-
-					art = form.save(commit=False)
-					art.publication_date = datetime.datetime.now()
-					art.author = request.user.author
-					art.save()
-					article_pk = art.pk
-
-				return render_to_response('blog/edit_one_article.html', {'article_pk': article_pk, 'form': form, 'is_good': is_good}, 
+				return render_to_response('blog/edit_one_article.html', {'article_pk': instance.pk, 'form': form, 'is_good': is_good}, 
 					context_instance=RequestContext(request))
 		else:
 			try:
@@ -215,7 +209,7 @@ def edit_one_article(request, article_pk=0):
 
 				form = ArticleForm(instance=article)
 			except ObjectDoesNotExist:
-				form = ArticleForm(request.POST)
+				form = ArticleForm()
 
 			return render_to_response('blog/edit_one_article.html', {'article_pk': article_pk, 'form': form, 'is_good': is_good}, 
 				context_instance=RequestContext(request))
