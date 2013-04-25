@@ -4,9 +4,14 @@
 
 {% block content %}
   <h1>Login</h1>
-  {% if not is_good %}
+  {% if not is_good.0 %}
   <h3>Wrong username or password.</h3>
   {% endif %}
+  
+  {% if not is_good.1 %}
+  <h3>Account not activated yet, check your email for the validation link. <a href="/blog/resend/">Not there? resend it here!</a></h3>
+  {% endif %}
+  
   <form action="/blog/login/" method="post">{% csrf_token %}
   {{ form.as_p }}
   <input type="submit" value="Login" />
