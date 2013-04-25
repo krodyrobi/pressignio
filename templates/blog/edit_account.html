@@ -7,10 +7,53 @@
 {% block content %}
   <h1>My account</h1>
   {% if is_good %}
-  <h3>Saved.</h3>
+  <div class="alert alert-success">  
+    <a class="close" data-dismiss="alert">×</a>  
+    <strong>Saved.</strong> Your edits have been saved successfully.  
+  </div>
+  {% else %}
+    {% for key, value in form.errors.items %}
+      {% if key == '__all__' %}
+      <div class="alert alert-error">  
+        <a class="close" data-dismiss="alert">×</a>  
+        <strong>Error!</strong> {{ value|removetags:"ul li" }}
+      </div>
+      {% endif %}
+    {% endfor %}
   {% endif %}
-  <form action="/blog/myaccount/" method="post">{% csrf_token %}
-  {{ form.as_p }}
-  <input type="submit" value="Save" />
+  <form class="form-horizontal" action="/blog/myaccount/" method="post">{% csrf_token %}
+    <div class="control-group{% if form.passw.errors%} error{% endif %}">
+      <label class="control-label" for="id_passw">Password</label>
+      <div class="controls">
+        <input type="password" id="id_passw" name="passw">
+        <span class="help-inline">{{ form.passw.errors|removetags:"li" }}</span>
+      </div>
+    </div>
+    <div class="control-group{% if form.pass_check.errors%} error{% endif %}">
+      <label class="control-label" for="id_pass_check">Re-type password</label>
+      <div class="controls">
+        <input type="password" id="id_pass_check" name="pass_check">
+        <span class="help-inline">{{ form.pass_check.errors|removetags:"li" }}</span>
+      </div>
+    </div>
+    <div class="control-group{% if form.author_name.errors%} error{% endif %}">
+      <label class="control-label" for="id_author_name">Author name</label>
+      <div class="controls">
+        <input type="text" id="id_author_name" name="author_name" placeholder="Author Name" value="{% if form.author_name.value != None %}{{ form.author_name.value }}{% endif %}">
+        <span class="help-inline">{{ form.author_name.errors|removetags:"li" }}</span>
+      </div>
+    </div>
+    <div class="control-group{% if form.author_description.errors%} error{% endif %}">
+      <label class="control-label" for="id_author_description">Author Description</label>
+      <div class="controls">
+        <textarea id="id_author_description" rows="4" name="author_description" placeholder="Author Description">{% if form.author_description.value != None %}{{ form.author_description.value }}{% endif %}</textarea>
+        <span class="help-inline">{{ form.author_description.errors|removetags:"li" }}</span>
+      </div>
+    </div>
+    <div class="control-group">
+      <div class="controls">
+        <button type="submit" class="btn btn-primary">Save</button>
+      </div>
+    </div>
   </form>
 {% endblock %}

@@ -108,7 +108,7 @@ def edit_account(request):
 
 				form.save()
 
-				return render_to_response('blog/edit_account.html', {'is_good': is_good, 'form': form},
+			return render_to_response('blog/edit_account.html', {'is_good': is_good, 'form': form},
 					context_instance=RequestContext(request))
 		else:
 			form = AccountForm(instance=user, initial={'author_name': user.author.name,

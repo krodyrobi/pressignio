@@ -80,7 +80,7 @@ class RegisterForm(forms.Form):
 class AccountForm(ModelForm):
 	class Meta:
 		model = User
-		exclude = ('username', 'password', 'first_name', 'last_name', 'is_staff', 'is_active', 'is_superuser', 'last_login', 'date_joined',
+		exclude = ('username', 'password', 'email', 'first_name', 'last_name', 'is_staff', 'is_active', 'is_superuser', 'last_login', 'date_joined',
 			'groups', 'user_permissions')
 
 		fields = ['passw', 'pass_check', 'email', 'author_name', 'author_description']	
@@ -93,14 +93,15 @@ class AccountForm(ModelForm):
 	def clean(self):
 		cleaned_data = super(AccountForm, self).clean()
 
-		if len(cleaned_data['passw']) < 6:
-			raise forms.ValidationError('Password must be at least 6 characters long.')
+		if 'passw' in cleaned_data:
+			if len(cleaned_data['passw']) < 6:
+				raise forms.ValidationError('Password must be at least 6 characters long.')
 
-		password1 = cleaned_data['passw']
-		password2 = cleaned_data['pass_check']
+			password1 = cleaned_data['passw']
+			password2 = cleaned_data['pass_check']
 
-		if password1 != password2:
-			raise forms.ValidationError('Passwords must match!')
+			if password1 != password2:
+				raise forms.ValidationError('Passwords must match.')
 
 		return cleaned_data
 

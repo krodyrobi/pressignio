@@ -19,18 +19,12 @@
       <p>Are you sure you want to delete the article?</p>
     </div>
     <div class="modal-footer">
-      <ul class="inline">
-        <li>
-          <form action="/blog/myarticles/delete/" method="post">{% csrf_token %}
-            <input for="id_pk" type="hidden" name="pk" value="{{ article.pk }}" />
-            <input for="id_page" type="hidden" name="page" value="{{ page }}" />
-            <input type="submit" class="btn btn-danger" value="Yes"></input>
-          </form>
-        </li>
-        <li>
-          <button class="btn" data-dismiss="modal" aria-hidden="true">No</button>
-        </li>
-      </ul>
+	  <form class="form-inline" action="/blog/myarticles/delete/" method="post">{% csrf_token %}
+	    <input for="id_pk" type="hidden" name="pk" value="{{ article.pk }}" />
+	    <input for="id_page" type="hidden" name="page" value="{{ page }}" />
+	    <input type="submit" class="btn btn-danger" value="Yes"></input>
+	    <button class="btn btn-cancel" data-dismiss="modal" aria-hidden="true">No</button>
+	  </form>
     </div>
   </div>
   <h2>{{ article.title }}</h2>

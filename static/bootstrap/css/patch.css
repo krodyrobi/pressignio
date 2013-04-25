@@ -1,4 +1,5 @@
-.btn {
+ul.inline>li {
 	padding-left: 0px;
 	padding-right: 0px;
+	vertical-align: bottom;
 }
