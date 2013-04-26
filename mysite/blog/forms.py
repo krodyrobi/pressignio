@@ -32,10 +32,10 @@ class RegisterForm(forms.Form):
 	password = forms.CharField(label="Password",widget=forms.PasswordInput,min_length=6)
 	pass_check = forms.CharField(label="Re-type password",widget=forms.PasswordInput)
 
-	author_name = forms.CharField(max_length=100)
+	author_name = forms.CharField(label="Author Name",max_length=100)
 	author_description = forms.CharField(label="Description",widget=forms.Textarea)
 
-	email = forms.EmailField()
+	email = forms.EmailField(label="Email")
 
 	def __init__(self, *args, **kwargs):
 		super(RegisterForm, self).__init__(*args, **kwargs)
@@ -50,14 +50,17 @@ class RegisterForm(forms.Form):
 		
 		try:
 			check = User.objects.get(username=cleaned_data['username'])
-			
 		except ObjectDoesNotExist:
 			pass
 		else:
 			raise forms.ValidationError("Username already exists, please choose another one!")
 		
 		try:
-			check = User.objects.get(email=cleaned_data['email'])
+			if 'email' in cleaned_data:
+				check = User.objects.get(email=cleaned_data['email'])
+			else:
+				raise forms.ValidationError("Email is invalid.")
+				
 		except ObjectDoesNotExist:
 			pass
 		else:
