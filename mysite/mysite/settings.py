@@ -7,6 +7,8 @@ ADMINS = (
     # ('Your Name', 'your_email@example.com'),
 )
 
+MANAGERS = ADMINS
+
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 EMAIL_HOST = 'localhost'
@@ -16,12 +18,10 @@ EMAIL_HOST_USER = ''
 EMAIL_SUBJECT_PREFIX = 'django'
 EMAIL_USE_TLS = True
 
-MANAGERS = ADMINS
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': 'testsite',                      # Or path to database file if using sqlite3.
+        'NAME': 'tutorial',                      # Or path to database file if using sqlite3.
         'USER': 'root',                      # Not used with sqlite3.
         'PASSWORD': '',                  # Not used with sqlite3.
         'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
@@ -65,9 +65,7 @@ MEDIA_URL = ''
 # Don't put anything in this directory yourself; store your static files
 # in apps' "static/" subdirectories and in STATICFILES_DIRS.
 # Example: "/home/media/media.lawrence.com/static/"
-
-STATIC_ROOT = '/home/robert/GIT/pressigno/static/'
-
+STATIC_ROOT = '/home/dragos/pressignio/static_dir/'
 
 # URL prefix for static files.
 # Example: "http://media.lawrence.com/static/"
@@ -75,10 +73,10 @@ STATIC_URL = '/static/'
 
 # Additional locations of static files
 STATICFILES_DIRS = (
+    '/home/dragos/pressignio/static/',
     # Put strings here, like "/home/html/static" or "C:/www/django/static".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-    '/home/robert/GIT/pressignio/static/',
 )
 
 # List of finder classes that know how to find static files in
@@ -115,7 +113,7 @@ ROOT_URLCONF = 'mysite.urls'
 WSGI_APPLICATION = 'mysite.wsgi.application'
 
 TEMPLATE_DIRS = (
-    "/home/robert/GIT/pressignio/templates"
+    "/home/dragos/pressignio/templates"
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
 )
