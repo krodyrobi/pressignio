@@ -6,8 +6,9 @@ from django.http import Http404
 from django.shortcuts import get_object_or_404, render, render_to_response, redirect
 from django.template import RequestContext
 from django.core.urlresolvers import reverse
+from django.db.models import Q
 
-from blog.forms import LoginForm, RegisterForm, ArticleForm, EditForm, DeleteForm, AccountForm, EmailResendForm, ResetPasswordForm, sendValidationEmail
+from blog.forms import LoginForm, RegisterForm, ArticleForm, EditForm, DeleteForm, AccountForm, EmailResendForm, ResetPasswordForm, sendValidationEmail, sendRetrievePasswordEmail
 from blog.models import Article, Author
 
 import datetime
@@ -59,14 +60,20 @@ def confirm(request, username, confirmation_code):
 		try:
 			user = User.objects.get(username = username, author__confirmation_code = confirmation_code, is_active = False)
 		except ObjectDoesNotExist:
-			raise Http404
+			message_error = ' Wrong activation link. Try again!'
+			request.session['message_error'] = message_error
+			return redirect(reverse('login_user'))
 
 		user.is_active = True
 		user.save()
-
+		
+		message = ' Account succesfully activated.'
+		request.session['message'] = message
+		
 		return redirect(reverse('login_user'))
 				
 	else:
+		
 		return redirect(reverse('index'))
 
 def resetPassword(request):
@@ -75,7 +82,7 @@ def resetPassword(request):
 			form = ResetPasswordForm(request.POST)
 		
 			if form.is_valid():
-				user = User.objects.get(email = form.cleaned_data['email'])
+				user = User.objects.get(Q(email=form.cleaned_data['username_email']) | Q(username=form.cleaned_data['username_email']))
 				form.send(user)
 			
 				return render_to_response('blog/reset_password.html', {'form': form, 'is_good': True}, context_instance=RequestContext(request))
@@ -84,6 +91,25 @@ def resetPassword(request):
 		else:
 			form = ResetPasswordForm()
 			return render_to_response('blog/reset_password.html', {'form': form}, context_instance=RequestContext(request))
+	else:
+		raise Http404
+		
+def passwordRecovery(request, username, recovery_code):
+	if request.user.is_anonymous():
+		if request.method == 'GET':
+			try:
+					user = User.objects.get(username = username, author__recovery_code = recovery_code)
+			except ObjectDoesNotExist:
+				message_error = ' Wrong recovery link. Try again!'
+				request.session['message_error'] = message_error
+				return redirect(reverse('login_user'))
+			else:
+				sendRetrievePasswordEmail(user)
+				message = ' Password reset successfull check your email for the new password. (%s)' % (user.email)
+				request.session['message'] = message
+				return redirect(reverse('login_user'))
+		else:
+			raise Http404
 	else:
 		raise Http404
 		
@@ -109,14 +135,19 @@ def login_user(request):
 					context_instance=RequestContext(request))
 	else:
 		form = LoginForm()
+		message = None
+		message_error = None
+		
 		if 'message' in request.session:
 			message = request.session['message']
 			del request.session['message']
-			
-			print message
-					
-			return render_to_response('blog/login.html', {'is_good': [True,True], 'form': form, 'message': message},
-			context_instance=RequestContext(request))
+		if 'message_error' in request.session:
+			message_error = request.session['message_error']
+			del request.session['message_error']
+		
+		if message or message_error:			
+			return render_to_response('blog/login.html', {'is_good': [True,True], 'form': form, 'message': message, 'message_error': message_error},
+				context_instance=RequestContext(request))
 		else:	
 			return render_to_response('blog/login.html', {'is_good': [True,True], 'form': form},
 			context_instance=RequestContext(request))

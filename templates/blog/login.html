@@ -12,6 +12,12 @@
     <strong>Success.</strong>{{ message }}
   </div>
   {% endif %}
+  {% if message_error != None %}
+  <div class="alert alert-error">  
+    <a class="close" data-dismiss="alert">×</a>  
+    <strong>Error.</strong>{{ message_error }}
+  </div>
+  {% endif %}
   {% if not is_good.0 %}
   <div class="alert alert-error">  
     <a class="close" data-dismiss="alert">×</a>  
