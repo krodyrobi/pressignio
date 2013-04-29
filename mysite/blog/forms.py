@@ -4,6 +4,8 @@ from django.contrib.auth.models import User
 from django import forms
 from django.forms import ModelForm, ValidationError
 from django.forms.util import ErrorList
+from django.db.models import Q
+
 
 from blog.models import Article, Author
 
@@ -15,7 +17,12 @@ import random
 def sendValidationEmail(user, author):
 
 	title = "Pressignio account confirmation:"
-	content = "localhost:8000/blog/confirm/" + str(author.confirmation_code) + "/" + user.username
+	content = "localhost:8000/blog/confirm/%s/%s/" % (author.confirmation_code, user.username)
+	send_mail(title, content, 'pressignio-bot@presslabs.com', [user.email], fail_silently=False)
+	
+def sendPasswordRecoveryConfirm(user):
+	title = "Pressignio password recovery:"
+	content = "localhost:8000/blog/passwordRecovery/%s/%s/" % (user.author.recovery_code, user.username)
 	send_mail(title, content, 'pressignio-bot@presslabs.com', [user.email], fail_silently=False)
 	
 def sendRetrievePasswordEmail(user):
@@ -24,7 +31,7 @@ def sendRetrievePasswordEmail(user):
 	user.save()
 	
 	title = "Pressignio account password:"
-	content = "Username:%s\n Password:%s" % (user.username, password)
+	content = "Username:%s\nPassword:%s" % (user.username, password)
 	send_mail(title, content, 'pressignio-bot@presslabs.com', [user.email], fail_silently=False)
 
 class RegisterForm(forms.Form):
@@ -67,6 +74,16 @@ class RegisterForm(forms.Form):
 			if not self._errors.has_key('email'):
 				self._errors['email'] = ErrorList()
 				self._errors["email"].append(u'Email already in use!')
+			
+		try:
+			if 'author_name' in cleaned_data:
+				check = Author.objects.get(name__iexact=cleaned_data['author_name'])
+		except ObjectDoesNotExist:
+			pass
+		else:
+			if not self._errors.has_key('author_name'):
+				self._errors['author_name'] = ErrorList()
+				self._errors["author_name"].append(u'This name has already been taken, please choose another.')
 		
 		password = cleaned_data.get("password")
 		pass_check = cleaned_data.get("pass_check")
@@ -110,20 +127,25 @@ class EmailResendForm(forms.Form):
 		sendValidationEmail(user,author)
 		
 class ResetPasswordForm(forms.Form):
-	username = forms.CharField(max_length=30, label= "Username")
-	email = forms.EmailField(label = "Email")
+	username_email = forms.CharField(max_length=30, label= "Username")
 	
 	def clean(self):
 		cleaned_data = super(ResetPasswordForm, self).clean()
+		
 		try:
-			if 'email' in cleaned_data and 'username' in cleaned_data:
-				check = User.objects.get(email=cleaned_data['email'], username=cleaned_data['username'])
+			if 'username_email' in cleaned_data:
+				check = User.objects.get(Q(email=cleaned_data['username_email']) | Q(username=cleaned_data['username_email']) )
 		except ObjectDoesNotExist:
-			raise ValidationError('Username and email pair does not match!')
+				if not self._errors.has_key('username_email'):
+					self._errors['username_email'] = ErrorList()
+					self._errors['username_email'].append(u'No account with the email or username provided.')	
+				
 		return cleaned_data
 		
 	def send(self,user):
-		sendRetrievePasswordEmail(user)
+		user.author.recovery_code = ''.join(random.choice(string.ascii_uppercase + string.digits + string.ascii_lowercase) for x in range(35))
+		user.author.save()
+		sendPasswordRecoveryConfirm(user)
 
 
 class AccountForm(ModelForm):
@@ -141,6 +163,16 @@ class AccountForm(ModelForm):
 
 	def clean(self):
 		cleaned_data = super(AccountForm, self).clean()
+		
+		try:
+			if 'author_name' in cleaned_data:
+				check = Author.objects.get(name__iexact=cleaned_data['author_name'])
+		except ObjectDoesNotExist:
+			pass
+		else:
+			if not self._errors.has_key('author_name'):
+				self._errors['author_name'] = ErrorList()
+				self._errors["author_name"].append(u'This name has already been taken, please choose another.')
 
 		if 'passw' in cleaned_data:
 

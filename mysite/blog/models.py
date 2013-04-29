@@ -11,6 +11,7 @@ class Author(models.Model):
 	slug = models.SlugField()
 	description = models.TextField()
 	confirmation_code = models.CharField(max_length = 35)
+	recovery_code = models.CharField(max_length = 35)
 
 	def __unicode__(self):
 		return self.name
