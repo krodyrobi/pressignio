@@ -24,9 +24,11 @@ def registerUser(request):
 			if form.is_valid():
 				data = form.cleaned_data
 				user,author = form.save()
-				sendValidationEmail(user,author)	
+				sendValidationEmail(user,author)
+				message = ' Account has been created, to complete the registration process go to the link sent to your email adress (%s)' %(data['email'])
+				request.session['message'] = message
 				
-				return render_to_response('blog/register_ok.html', {'author': data},context_instance=RequestContext(request))
+				return redirect(reverse('login_user'))
 			else: 
 				return render_to_response('blog/register.html', {'form': form}, context_instance=RequestContext(request))
 		else:
@@ -34,6 +36,7 @@ def registerUser(request):
 				return render_to_response('blog/register.html', {'form': form}, context_instance=RequestContext(request))
 	else:
 		raise Http404
+
 def resendEmailValidation(request):
 	if request.method == 'POST':
 		form = EmailResendForm(request.POST)
@@ -106,8 +109,18 @@ def login_user(request):
 					context_instance=RequestContext(request))
 	else:
 		form = LoginForm()
-		return render_to_response('blog/login.html', {'is_good': [True,True], 'form': form},
+		if 'message' in request.session:
+			message = request.session['message']
+			del request.session['message']
+			
+			print message
+					
+			return render_to_response('blog/login.html', {'is_good': [True,True], 'form': form, 'message': message},
 			context_instance=RequestContext(request))
+		else:	
+			return render_to_response('blog/login.html', {'is_good': [True,True], 'form': form},
+			context_instance=RequestContext(request))
+			
 
 def logout_user(request):
 	logout(request)

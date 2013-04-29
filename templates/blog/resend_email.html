@@ -8,17 +8,8 @@
   {% if is_good %}
   <div class="alert alert-success">  
     <a class="close" data-dismiss="alert">×</a>  
-    <strong>SUCCESS!</strong> An email has been sent to that email address.
+    <strong>Success.</strong> An email has been sent to that email address.
   </div>
-  {% else %}
-  	{% for key, value in form.errors.items %}
-  		{%if key == '__all__'%}
-  		<div class="alert alert-error">  
-          <a class="close" data-dismiss="alert">×</a>  
-          <strong>ERROR!</strong> {{ value|removetags:"ul li" }}
-        </div>
-        {% endif %}
-    {% endfor %}
   {% endif %}
   
   
