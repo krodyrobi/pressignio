@@ -88,38 +88,42 @@ def resetPassword(request):
 		raise Http404
 		
 def login_user(request):
-	if request.method == 'POST':
-		form = LoginForm(request.POST)
+	if request.user.is_anonymous():
+		if request.method == 'POST':
+			form = LoginForm(request.POST)
 
-		if form.is_valid():
-			user = authenticate(username=form.cleaned_data['username'],
-				password=form.cleaned_data['password'])
-			if user is not None:
-				if user.is_active:
-					login(request, user)
-					return redirect(reverse('index'))
+			if form.is_valid():
+				user = authenticate(username=form.cleaned_data['username'],
+					password=form.cleaned_data['password'])
+				if user is not None:
+					if user.is_active:
+						login(request, user)
+						return redirect(reverse('index'))
+					else:
+						return render_to_response('blog/login.html', {'is_good': [True,False], 'form': form},
+						context_instance=RequestContext(request))
 				else:
-					return render_to_response('blog/login.html', {'is_good': [True,False], 'form': form},
-					context_instance=RequestContext(request))
+					return render_to_response('blog/login.html', {'is_good': [False,True], 'form': form},
+						context_instance=RequestContext(request))
 			else:
 				return render_to_response('blog/login.html', {'is_good': [False,True], 'form': form},
-					context_instance=RequestContext(request))
+						context_instance=RequestContext(request))
 		else:
-			return render_to_response('blog/login.html', {'is_good': [False,True], 'form': form},
-					context_instance=RequestContext(request))
-	else:
-		form = LoginForm()
-		if 'message' in request.session:
-			message = request.session['message']
-			del request.session['message']
+			form = LoginForm()
+			if 'message' in request.session:
+				message = request.session['message']
+				del request.session['message']
 			
-			print message
+				print message
 					
-			return render_to_response('blog/login.html', {'is_good': [True,True], 'form': form, 'message': message},
-			context_instance=RequestContext(request))
-		else:	
-			return render_to_response('blog/login.html', {'is_good': [True,True], 'form': form},
-			context_instance=RequestContext(request))
+				return render_to_response('blog/login.html', {'is_good': [True,True], 'form': form, 'message': message},
+				context_instance=RequestContext(request))
+			else:	
+				return render_to_response('blog/login.html', {'is_good': [True,True], 'form': form},
+				context_instance=RequestContext(request))
+
+	else:
+		return redirect(reverse('index'))
 			
 
 def logout_user(request):
@@ -171,7 +175,11 @@ def edit_articles(request, page=1):
 		raise Http404
 	else:
 		author = request.user.author
-		latest_articles_list = Article.objects.filter(author=author).order_by('-publication_date')[5 * (int(page) - 1) : 5 * int(page)]
+		latest_articles_list = []
+		page = int(page) + 1
+		while not latest_articles_list and page > 1:
+			page = int(page) - 1
+			latest_articles_list = Article.objects.filter(author=author).order_by('-publication_date')[5 * (int(page) - 1) : 5 * int(page)]
 		last = Article.objects.filter(author=author).count() <= 5 * int(page)
 		return render_to_response('blog/edit_articles.html', {'latest_articles_list': latest_articles_list,
 			'page': int(page), 'last': last}, context_instance=RequestContext(request))
@@ -187,13 +195,12 @@ def edit(request):
 				try:
 					article_pk = form.cleaned_data['pk']
 
-					article = Article.objects.get(pk=article_pk)
+					article = Article.objects.get(pk=article_pk, author=request.user.author)
 					form = ArticleForm(instance=article)
-
 					return render_to_response('blog/edit_one_article.html', {'article_pk': article_pk, 'form': form, 'is_good': False}, 
 					context_instance=RequestContext(request))
 				except ObjectDoesNotExist:
-					return edit_one_article(request)
+					return render_to_response('blog/edit_one_article.html', {'article_pk': 0, 'is_good': False}, context_instance=RequestContext(request))
 
 			else:
 				raise Http404
@@ -211,7 +218,7 @@ def delete(request):
 				try:
 					article_pk = form.cleaned_data['pk']
 
-					article = Article.objects.get(pk=article_pk)
+					article = Article.objects.get(pk=article_pk, author=request.user.author)
 					article.delete()
 				except ObjectDoesNotExist:
 					raise Http404
@@ -231,7 +238,7 @@ def edit_one_article(request, article_pk=0):
 	else:
 		if request.method == 'POST':
 			try:
-				article = Article.objects.get(pk=article_pk)
+				article = Article.objects.get(pk=article_pk, author=request.user.author)
 
 				form = ArticleForm(request.POST, instance=article)
 
@@ -246,15 +253,21 @@ def edit_one_article(request, article_pk=0):
 				return render_to_response('blog/edit_one_article.html', {'article_pk': article_pk, 'form': form, 'is_good': is_good}, 
 					context_instance=RequestContext(request))
 			except ObjectDoesNotExist:
-				instance=Article(title='', text='', author=request.user.author, publication_date=datetime.datetime.now())
-				instance.save()
-				form = ArticleForm(instance=Article())
+				form = ArticleForm(request.POST)
 
-				return render_to_response('blog/edit_one_article.html', {'article_pk': instance.pk, 'form': form, 'is_good': is_good}, 
+				if form.is_valid():
+					is_good = True
+
+					art = form.save(commit=False)
+					art.publication_date = datetime.datetime.now()
+					art.author = request.user.author
+					art.save()
+
+				return render_to_response('blog/edit_one_article.html', {'article_pk': art.pk, 'form': form, 'is_good': is_good}, 
 					context_instance=RequestContext(request))
 		else:
 			try:
-				article = Article.objects.get(pk=article_pk)
+				article = Article.objects.get(pk=article_pk, author=request.user.author)
 
 				form = ArticleForm(instance=article)
 			except ObjectDoesNotExist:
