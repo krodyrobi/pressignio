@@ -6,6 +6,12 @@
 
 {% block content %}
   <h1>Login</h1>
+  {% if message != None %}
+  <div class="alert alert-success">  
+    <a class="close" data-dismiss="alert">×</a>  
+    <strong>Success.</strong>{{ message }}
+  </div>
+  {% endif %}
   {% if not is_good.0 %}
   <div class="alert alert-error">  
     <a class="close" data-dismiss="alert">×</a>  
@@ -22,7 +28,7 @@
     <div class="control-group{% if form.username.errors%} error{% endif %}">
       <label class="control-label" for="id_username">Username</label>
       <div class="controls">
-        <input type="text" id="id_username" name="username" placeholder="Username">
+        <input type="text" id="id_username" name="username" placeholder="Username" value="{% if form.username.value != None %}{{ form.username.value }}{% endif %}">
         <span class="help-inline">{{ form.username.errors|removetags:"li" }}</span>
       </div>
     </div>
@@ -33,6 +39,10 @@
         <span class="help-inline">{{ form.password.errors|removetags:"li" }}</span>
       </div>
     </div>
+    <div class="controls">
+      <a href="/blog/reset_password/">Password Forgotten?</a>
+    </div>
+    <br />
     <div class="control-group">
       <div class="controls">
         <button type="submit" class="btn btn-primary">Login</button>

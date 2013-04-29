@@ -28,7 +28,7 @@ def sendRetrievePasswordEmail(user):
 	send_mail(title, content, 'pressignio-bot@presslabs.com', [user.email], fail_silently=False)
 
 class RegisterForm(forms.Form):
-	username = forms.CharField(max_length=30)
+	username = forms.CharField(label="Username",max_length=30)
 	password = forms.CharField(label="Password",widget=forms.PasswordInput,min_length=6)
 	pass_check = forms.CharField(label="Re-type password",widget=forms.PasswordInput)
 
@@ -47,31 +47,34 @@ class RegisterForm(forms.Form):
 
 	def clean(self):
 		cleaned_data = super(RegisterForm, self).clean()
-		
+      
 		try:
-			check = User.objects.get(username=cleaned_data['username'])
+			if 'username' in cleaned_data: 
+				check = User.objects.get(username=cleaned_data['username'])
 		except ObjectDoesNotExist:
 			pass
 		else:
-			raise forms.ValidationError("Username already exists, please choose another one!")
-		
+			if not self._errors.has_key('username'):
+				self._errors['username'] = ErrorList()
+				self._errors['username'].append(u'Username already in use, choose another!')
+				
 		try:
 			if 'email' in cleaned_data:
 				check = User.objects.get(email=cleaned_data['email'])
-			else:
-				raise forms.ValidationError("Email is invalid.")
-				
 		except ObjectDoesNotExist:
 			pass
 		else:
-			raise forms.ValidationError("Email already taken, please choose another one!")
+			if not self._errors.has_key('email'):
+				self._errors['email'] = ErrorList()
+				self._errors["email"].append(u'Email already in use!')
 		
-		password1 = cleaned_data.get("password")
-		password2 = cleaned_data.get("pass_check")
+		password = cleaned_data.get("password")
+		pass_check = cleaned_data.get("pass_check")
 
-		if password1 != password2:
-			raise forms.ValidationError("Passwords must match!")
-		
+		if password != pass_check:
+			if not self._errors.has_key('pass_check'):
+				self._errors['pass_check'] = ErrorList()
+				self._errors["pass_check"].append(u'Passwords must match!')
 	
 		return cleaned_data
 
@@ -97,20 +100,24 @@ class EmailResendForm(forms.Form):
 		try:
 			check = Author.objects.get(user__email=email, user__is_active=False)
 		except ObjectDoesNotExist:
-			raise ValidationError('Email not found or user already active!')
+			if not self._errors.has_key('email'):
+				self._errors['email'] = ErrorList()
+				self._errors['email'].append(u'Email not found or user already active!')
+			
 		return email
     	
 	def resend(self, user, author):
 		sendValidationEmail(user,author)
 		
-class RetrievePasswordForm(forms.Form):
+class ResetPasswordForm(forms.Form):
 	username = forms.CharField(max_length=30, label= "Username")
 	email = forms.EmailField(label = "Email")
 	
 	def clean(self):
-		cleaned_data = super(RetrievePasswordForm, self).clean()
+		cleaned_data = super(ResetPasswordForm, self).clean()
 		try:
-			check = User.objects.get(email=cleaned_data['email'], username=cleaned_data['username'])
+			if 'email' in cleaned_data and 'username' in cleaned_data:
+				check = User.objects.get(email=cleaned_data['email'], username=cleaned_data['username'])
 		except ObjectDoesNotExist:
 			raise ValidationError('Username and email pair does not match!')
 		return cleaned_data
@@ -122,7 +129,7 @@ class RetrievePasswordForm(forms.Form):
 class AccountForm(ModelForm):
 	class Meta:
 		model = User
-		exclude = ('username', 'password', 'first_name', 'last_name', 'is_staff', 'is_active', 'is_superuser', 'last_login', 'date_joined',
+		exclude = ('username', 'password', 'email', 'first_name', 'last_name', 'is_staff', 'is_active', 'is_superuser', 'last_login', 'date_joined',
 			'groups', 'user_permissions')
 
 		fields = ['passw', 'pass_check', 'email', 'author_name', 'author_description']	
@@ -135,14 +142,15 @@ class AccountForm(ModelForm):
 	def clean(self):
 		cleaned_data = super(AccountForm, self).clean()
 
-		if len(cleaned_data['passw']) < 6:
-			raise forms.ValidationError('Password must be at least 6 characters long.')
+		if 'passw' in cleaned_data:
 
-		password1 = cleaned_data['passw']
-		password2 = cleaned_data['pass_check']
+			password1 = cleaned_data['passw']
+			password2 = cleaned_data['pass_check']
 
-		if password1 != password2:
-			raise forms.ValidationError('Passwords must match!')
+			if password1 != password2:
+				if not self._errors.has_key('pass_check'):
+					self._errors['pass_check'] = ErrorList()
+					self._errors['pass_check'].append(u'Passwords must match!')
 
 		return cleaned_data
 

@@ -7,7 +7,7 @@ from django.shortcuts import get_object_or_404, render, render_to_response, redi
 from django.template import RequestContext
 from django.core.urlresolvers import reverse
 
-from blog.forms import LoginForm, RegisterForm, ArticleForm, EditForm, DeleteForm, AccountForm, EmailResendForm, RetrievePasswordForm, sendValidationEmail
+from blog.forms import LoginForm, RegisterForm, ArticleForm, EditForm, DeleteForm, AccountForm, EmailResendForm, ResetPasswordForm, sendValidationEmail
 from blog.models import Article, Author
 
 import datetime
@@ -17,21 +17,23 @@ def index(request):
 	return render_to_response('blog/index.html', {'latest_articles_list': latest_articles_list}, context_instance=RequestContext(request))
 		
 def registerUser(request):
-	if request.method == 'POST':	
-		form = RegisterForm(request.POST)
-
-		if form.is_valid():
-			data = form.cleaned_data
-			user,author = form.save()
-			sendValidationEmail(user,author)	
-						
-			return render_to_response('blog/register_ok.html', {'author': data},context_instance=RequestContext(request))
-		else: 
-			return render_to_response('blog/register.html', {'form': form}, context_instance=RequestContext(request))
+	if request.user.is_anonymous():
+		if request.method == 'POST':	
+			form = RegisterForm(request.POST)
+			
+			if form.is_valid():
+				data = form.cleaned_data
+				user,author = form.save()
+				sendValidationEmail(user,author)	
+				
+				return render_to_response('blog/register_ok.html', {'author': data},context_instance=RequestContext(request))
+			else: 
+				return render_to_response('blog/register.html', {'form': form}, context_instance=RequestContext(request))
+		else:
+				form = 	RegisterForm()	
+				return render_to_response('blog/register.html', {'form': form}, context_instance=RequestContext(request))
 	else:
-			form = 	RegisterForm()	
-			return render_to_response('blog/register.html', {'form': form}, context_instance=RequestContext(request))
-
+		raise Http404
 def resendEmailValidation(request):
 	if request.method == 'POST':
 		form = EmailResendForm(request.POST)
@@ -64,21 +66,21 @@ def confirm(request, username, confirmation_code):
 	else:
 		return redirect(reverse('index'))
 
-def retriveLostPassword(request):
+def resetPassword(request):
 	if request.user.is_anonymous():
 		if request.method == 'POST':
-			form = RetrievePasswordForm(request.POST)
+			form = ResetPasswordForm(request.POST)
 		
 			if form.is_valid():
 				user = User.objects.get(email = form.cleaned_data['email'])
 				form.send(user)
 			
-				return render_to_response('blog/retrieve_password.html', {'form': form, 'is_good': True}, context_instance=RequestContext(request))
+				return render_to_response('blog/reset_password.html', {'form': form, 'is_good': True}, context_instance=RequestContext(request))
 			else:
-				return render_to_response('blog/retrieve_password.html', {'form': form}, context_instance=RequestContext(request))
+				return render_to_response('blog/reset_password.html', {'form': form}, context_instance=RequestContext(request))
 		else:
-			form = RetrievePasswordForm()
-			return render_to_response('blog/retrieve_password.html', {'form': form}, context_instance=RequestContext(request))
+			form = ResetPasswordForm()
+			return render_to_response('blog/reset_password.html', {'form': form}, context_instance=RequestContext(request))
 	else:
 		raise Http404
 		
@@ -142,7 +144,7 @@ def edit_account(request):
 
 				form.save()
 
-				return render_to_response('blog/edit_account.html', {'is_good': is_good, 'form': form},
+			return render_to_response('blog/edit_account.html', {'is_good': is_good, 'form': form},
 					context_instance=RequestContext(request))
 		else:
 			form = AccountForm(instance=user, initial={'author_name': user.author.name,
