@@ -16,7 +16,6 @@ import re
 
 
 def sendValidationEmail(user, author):
-
 	title = "Pressignio account confirmation:"
 	content = "localhost:8000/blog/confirm/%s/%s/" % (author.confirmation_code, user.username)
 	send_mail(title, content, 'pressignio-bot@presslabs.com', [user.email], fail_silently=False)

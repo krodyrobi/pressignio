@@ -6,30 +6,15 @@
 
 {% block content %}
   <h1>Login</h1>
-  {% if message != None %}
-  <div class="alert alert-success">  
-    <a class="close" data-dismiss="alert">×</a>  
-    <strong>Success.</strong>{{ message }}
+  {% if messages %}
+    {% for message in messages %}
+    <div class="alert alert-{% if message.tags == 'error' %}error{% else %}success{% endif %}">  
+      <a class="close" data-dismiss="alert">×</a> 
+      <strong>{% if message.tags == 'error' %}Error!{% else %}Success.{% endif %}</strong> {{ message }}
+    </div>
+    {% endfor %}
+  {% endif %} 
   </div>
-  {% endif %}
-  {% if message_error != None %}
-  <div class="alert alert-error">  
-    <a class="close" data-dismiss="alert">×</a>  
-    <strong>Error.</strong>{{ message_error }}
-  </div>
-  {% endif %}
-  {% if not is_good.0 %}
-  <div class="alert alert-error">  
-    <a class="close" data-dismiss="alert">×</a>  
-    <strong>Error!</strong> Wrong username or password.  
-  </div>
-  {% endif %}
-  {% if not is_good.1 %}
-  <div class="alert alert-error">  
-    <a class="close" data-dismiss="alert">×</a>  
-    <strong>Error!</strong> Account not activated yet, check your email for the validation link. <a href="/blog/resend/">Not there? Resend it here!</a> 
-  </div>
-  {% endif %}
   <form class="form-horizontal" action="/blog/login/" method="post">{% csrf_token %}
     <div class="control-group{% if form.username.errors%} error{% endif %}">
       <label class="control-label" for="id_username">Username</label>

@@ -1,8 +1,10 @@
+from django.contrib import messages
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
 from django.core.exceptions import ObjectDoesNotExist
-from django.http import Http404
+from django.http import Http404, HttpResponseForbidden
 from django.shortcuts import get_object_or_404, render, render_to_response, redirect
 from django.template import RequestContext
 from django.core.urlresolvers import reverse
@@ -115,6 +117,7 @@ def passwordRecovery(request, username, recovery_code):
 		
 def login_user(request):
 	if request.user.is_anonymous():
+
 		if request.method == 'POST':
 			form = LoginForm(request.POST)
 
@@ -126,35 +129,40 @@ def login_user(request):
 						login(request, user)
 						return redirect(reverse('index'))
 					else:
-						return render_to_response('blog/login.html', {'is_good': [True,False], 'form': form},
+						messages.add_message(request, messages.ERROR, 
+							'''Account not activated yet, check your
+							 email for the validation link. <a href="
+							/blog/resend/">Not there? Resend it here!</a>''')
+
+						return render_to_response('blog/login.html', {'form': form},
 						context_instance=RequestContext(request))
 				else:
-					return render_to_response('blog/login.html', {'is_good': [False,True], 'form': form},
+					messages.add_message(request, messages.ERROR, 
+					'Wrong username or password.') 
+
+					return render_to_response('blog/login.html', {'form': form},
 						context_instance=RequestContext(request))
 			else:
-				return render_to_response('blog/login.html', {'is_good': [False,True], 'form': form},
+				return render_to_response('blog/login.html', {'form': form},
 						context_instance=RequestContext(request))
 		else:
 			form = LoginForm()
-			message = None
-			message_error = None
 		
 			if 'message' in request.session:
-				message = request.session['message']
+				messages.add_message(request, messages.INFO, 
+				request.session['message'])
 				del request.session['message']
 			if 'message_error' in request.session:
-				message_error = request.session['message_error']
+				messages.add_message(request, messages.ERROR, 
+				request.session['message_error'])
 				del request.session['message_error']
 		
-			if message or message_error:			
-				return render_to_response('blog/login.html', {'is_good': [True,True], 'form': form, 'message': message, 'message_error': message_error},
-					context_instance=RequestContext(request))
-			else:	
-				return render_to_response('blog/login.html', {'is_good': [True,True], 'form': form},
+			return render_to_response('blog/login.html', {'form': form},
 				context_instance=RequestContext(request))
 	else:
 		return redirect(reverse('index'))
-			
+
+@login_required			
 def logout_user(request):
 	logout(request)
 
@@ -173,134 +181,117 @@ def author(request, name_slug):
 		'latest_articles_list': latest_articles_list},
 		context_instance=RequestContext(request))
 
+@login_required
 def edit_account(request):
-	is_good = False
+	user = request.user
 
-	if request.user.is_anonymous():
-		raise Http404
-	else:
-		
-		user = request.user
+	if request.method == 'POST':
+		form = AccountForm(request.POST, instance=user)
 
-		if request.method == 'POST':
-			form = AccountForm(request.POST, instance=user)
+		if form.is_valid():
+			form.save()
 
-			if form.is_valid():
-				is_good = True
+		messages.add_message(request, messages.INFO, 
+			'Your edits have been saved successfully.')
 
-				form.save()
-
-			return render_to_response('blog/edit_account.html', {'is_good': is_good, 'form': form},
-					context_instance=RequestContext(request))
-		else:
-			form = AccountForm(instance=user, initial={'author_name': user.author.name,
-				'author_description': user.author.description})
-
-			return render_to_response('blog/edit_account.html', {'is_good': is_good, 'form': form},
-					context_instance=RequestContext(request))
-
-def edit_articles(request, page=1):
-	if request.user.is_anonymous():
-		raise Http404
-	else:
-		author = request.user.author
-		latest_articles_list = []
-		page = int(page) + 1
-		while not latest_articles_list and page > 1:
-			page = int(page) - 1
-			latest_articles_list = Article.objects.filter(author=author).order_by('-publication_date')[5 * (int(page) - 1) : 5 * int(page)]
-		last = Article.objects.filter(author=author).count() <= 5 * int(page)
-		return render_to_response('blog/edit_articles.html', {'latest_articles_list': latest_articles_list,
-			'page': int(page), 'last': last}, context_instance=RequestContext(request))
-
-def edit(request):
-	if request.user.is_anonymous():
-		raise Http404
-	else:
-		if request.method == 'POST':
-			form = EditForm(request.POST)
-
-			if form.is_valid():
-				try:
-					article_pk = form.cleaned_data['pk']
-
-					article = Article.objects.get(pk=article_pk, author=request.user.author)
-					form = ArticleForm(instance=article)
-					return render_to_response('blog/edit_one_article.html', {'article_pk': article_pk, 'form': form, 'is_good': False}, 
-					context_instance=RequestContext(request))
-				except ObjectDoesNotExist:
-					return render_to_response('blog/edit_one_article.html', {'article_pk': 0, 'is_good': False}, context_instance=RequestContext(request))
-
-			else:
-				raise Http404
-		else:
-			raise Http404
-
-def delete(request):
-	if request.user.is_anonymous():
-		raise Http404
-	else:
-		if request.method == 'POST':
-			form = DeleteForm(request.POST)
-
-			if form.is_valid():
-				try:
-					article_pk = form.cleaned_data['pk']
-
-					article = Article.objects.get(pk=article_pk, author=request.user.author)
-					article.delete()
-				except ObjectDoesNotExist:
-					raise Http404
-
-				return redirect(reverse('edit_articles', args=(form.cleaned_data['page'],)))
-
-			else:
-				raise Http404
-		else:
-			raise Http404
-
-def edit_one_article(request, article_pk=0):
-	is_good = False
-
-	if request.user.is_anonymous():
-		raise Http404
-	else:
-		if request.method == 'POST':
-			try:
-				article = Article.objects.get(pk=article_pk, author=request.user.author)
-
-				form = ArticleForm(request.POST, instance=article)
-
-				if form.is_valid():
-					is_good = True
-
-					art = form.save(commit=False)
-					art.publication_date = datetime.datetime.now()
-					art.author = request.user.author
-					art.save()
-
-				return render_to_response('blog/edit_one_article.html', {'article_pk': article_pk, 'form': form, 'is_good': is_good}, 
-					context_instance=RequestContext(request))
-			except ObjectDoesNotExist:
-				form = ArticleForm(request.POST)
-
-				if form.is_valid():
-					is_good = True
-
-					art = form.save(commit=False)
-					art.publication_date = datetime.datetime.now()
-					art.author = request.user.author
-					art.save()
-
-				return render_to_response('blog/edit_one_article.html', {'article_pk': art.pk, 'form': form, 'is_good': is_good}, 
-					context_instance=RequestContext(request))
-		else:
-			try:
-				article = Article.objects.get(pk=article_pk, author=request.user.author)
-
-				form = ArticleForm(instance=article)
-			except ObjectDoesNotExist:
-				form = ArticleForm()
-
-			return render_to_response('blog/edit_one_article.html', {'article_pk': article_pk, 'form': form, 'is_good': is_good}, 
+		return render_to_response('blog/edit_account.html', 
+				{'form': form},
 				context_instance=RequestContext(request))
+	else:
+		form = AccountForm(instance=user, initial={'author_name': user.author.name,
+			'author_description': user.author.description})
+
+		return render_to_response('blog/edit_account.html', 
+				{'form': form},
+				context_instance=RequestContext(request))
+
+@login_required
+def edit_articles(request, page=1):
+	author = request.user.author
+	latest_articles_list = []
+	page = int(page) + 1
+	while not latest_articles_list and page > 1:
+		page = int(page) - 1
+		latest_articles_list = Article.objects.filter(author=author)
+		latest_articles_list.order_by('-publication_date')[5 * (int(page) - 1) : 5 * int(page)]
+	last = Article.objects.filter(author=author).count() <= 5 * int(page)
+	return render_to_response('blog/edit_articles.html', 
+		{'latest_articles_list': latest_articles_list,
+		'page': int(page), 'last': last}, context_instance=RequestContext(request))
+
+@login_required
+def edit(request):
+	if request.method == 'POST':
+		form = EditForm(request.POST)
+
+		if form.is_valid():
+			try:
+				article_pk = form.cleaned_data['pk']
+
+				article = Article.objects.get(pk=article_pk, 
+					author=request.user.author)
+				form = ArticleForm(instance=article)
+				return render_to_response('blog/edit_one_article.html', 
+					{'article_pk': article_pk, 'form': form, 'is_good': False}, 
+					context_instance=RequestContext(request))
+			except Article.DoesNotExist:
+				return render_to_response('blog/edit_one_article.html', 
+					{'article_pk': 0, 'is_good': False}, 
+					context_instance=RequestContext(request))
+
+		else:
+			return HttpResponseForbidden()
+	else:
+		raise Http404
+
+@login_required
+def delete(request):
+	if request.method == 'POST':
+		form = DeleteForm(request.POST)
+
+		if form.is_valid():
+			try:
+				article_pk = form.cleaned_data['pk']
+
+				article = Article.objects.get(pk=article_pk, 
+					author=request.user.author)
+				article.delete()
+			except Article.DoesNotExist:
+				return HttpResponseForbidden()
+
+			return redirect(reverse('edit_articles', 
+				args=(form.cleaned_data['page'],)))
+
+		else:
+			return HttpResponseForbidden()
+	else:
+		raise Http404
+
+@login_required
+def edit_one_article(request, article_pk=0):
+	try:
+		article = Article.objects.get(pk=article_pk, author=request.user.author)
+	except Article.DoesNotExist:
+		article = None
+	if request.method == 'POST':
+		form = ArticleForm(request.POST, instance=article)
+		if form.is_valid():
+			art = form.save(commit=False)
+			art.author = request.user.author
+			art.save()
+
+		messages.add_message(request, messages.INFO, 
+			'Your edits have been saved successfully.')
+
+		return render_to_response('blog/edit_one_article.html', 
+			{'article_pk': article_pk, 'form': form}, 
+			context_instance=RequestContext(request))
+	else:
+		try:
+			article = Article.objects.get(pk=article_pk, author=request.user.author)
+		except Article.DoesNotExist:	
+			form = ArticleForm()
+
+		return render_to_response('blog/edit_one_article.html', 
+			{'article_pk': article_pk, 'form': form}, 
+			context_instance=RequestContext(request))
