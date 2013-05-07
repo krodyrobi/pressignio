@@ -1,10 +1,10 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
-from blog.models import Author, Article
+from blog.models import Article, UserProfile
 
 class AuthorInline(admin.StackedInline):
-	model = Author
+	model = UserProfile
 	fields = ("name", "description");
 
 class UserAdmin(UserAdmin):

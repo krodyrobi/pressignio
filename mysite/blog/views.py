@@ -9,7 +9,7 @@ from django.core.urlresolvers import reverse
 from django.db.models import Q
 
 from blog.forms import LoginForm, RegisterForm, ArticleForm, EditForm, DeleteForm, AccountForm, EmailResendForm, ResetPasswordForm, sendValidationEmail, sendRetrievePasswordEmail
-from blog.models import Article, Author
+from blog.models import Article, UserProfile
 
 import datetime
 

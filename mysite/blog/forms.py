@@ -7,11 +7,12 @@ from django.forms.util import ErrorList
 from django.db.models import Q
 
 
-from blog.models import Article, Author
+from blog.models import Article, UserProfile
 
 import string 
 import datetime
 import random
+import re
 
 
 def sendValidationEmail(user, author):
@@ -34,56 +35,66 @@ def sendRetrievePasswordEmail(user):
 	content = "Username:%s\nPassword:%s" % (user.username, password)
 	send_mail(title, content, 'pressignio-bot@presslabs.com', [user.email], fail_silently=False)
 
-class RegisterForm(forms.Form):
-	username = forms.CharField(label="Username",max_length=30)
-	password = forms.CharField(label="Password",widget=forms.PasswordInput,min_length=6)
-	pass_check = forms.CharField(label="Re-type password",widget=forms.PasswordInput)
-
-	author_name = forms.CharField(label="Author Name",max_length=100)
-	author_description = forms.CharField(label="Description",widget=forms.Textarea)
-
-	email = forms.EmailField(label="Email")
-
-	def __init__(self, *args, **kwargs):
-		super(RegisterForm, self).__init__(*args, **kwargs)
-
-
-		for field in self.fields.values():
-		    field.error_messages = {'required':'The field {fieldname} is required!'.format(fieldname=field.label)}
-
-
-	def clean(self):
-		cleaned_data = super(RegisterForm, self).clean()
-      
-		try:
-			if 'username' in cleaned_data: 
-				check = User.objects.get(username=cleaned_data['username'])
-		except ObjectDoesNotExist:
-			pass
-		else:
-			if not self._errors.has_key('username'):
-				self._errors['username'] = ErrorList()
-				self._errors['username'].append(u'Username already in use, choose another!')
-				
-		try:
-			if 'email' in cleaned_data:
-				check = User.objects.get(email=cleaned_data['email'])
-		except ObjectDoesNotExist:
-			pass
-		else:
-			if not self._errors.has_key('email'):
-				self._errors['email'] = ErrorList()
-				self._errors["email"].append(u'Email already in use!')
+class RegisterForm(ModelForm):
+	class Meta:
+		model = User
+		exclude = ('first_name', 'last_name', 'is_staff', 'email', 'is_active', 'is_superuser', 'last_login', 'date_joined',
+			'groups', 'user_permissions')
+	
+	pass_check = forms.CharField(label='Re-type password',widget=forms.PasswordInput)
+	email = forms.CharField(label='Email')
+	author_name = forms.CharField(max_length=100)
+	author_description = forms.CharField(label='Description',widget=forms.Textarea)
+		
+	def clean_username(self):
+		username = self.cleaned_data['username']
+		
+		if re.search(r'[^a-z0-9\._]+', username):
+			raise ValidationError('Illegal characters.')
 			
 		try:
-			if 'author_name' in cleaned_data:
-				check = Author.objects.get(name__iexact=cleaned_data['author_name'])
-		except ObjectDoesNotExist:
+			check = User.objects.get(username=username)
+			
+			raise ValidationError('Username already in use, choose another username.')
+		except User.DoesNotExist:
+			pass		
+		
+		return username
+		
+	def clean_password(self):
+		password = self.cleaned_data['password']
+		
+		if len(password) < 6:
+			raise ValidationError('Password must be at least 6 characters long (currently %s).' % (len(password)))
+		
+		return password
+		
+	def clean_email(self):
+		email = self.cleaned_data['email']
+		
+		try:
+			check = User.objects.get(email=email)
+			
+			raise ValidationError('Email already in use.')
+		except User.DoesNotExist:
 			pass
-		else:
-			if not self._errors.has_key('author_name'):
-				self._errors['author_name'] = ErrorList()
-				self._errors["author_name"].append(u'This name has already been taken, please choose another.')
+		
+		return email
+		
+	def clean_author_name(self):
+		author_name = self.cleaned_data['author_name']
+		
+		try:
+			check = UserProfile.objects.get(name__iexact=self.cleaned_data['author_name'])
+			
+			raise ValidationError('This name has already been taken, please choose another.')
+		except UserProfile.DoesNotExist:
+			pass
+	
+		return author_name
+		
+	def clean(self):
+		cleaned_data = super(RegisterForm, self).clean()
 		
 		password = cleaned_data.get("password")
 		pass_check = cleaned_data.get("pass_check")
@@ -102,7 +113,7 @@ class RegisterForm(forms.Form):
 		user.is_active = False
 		
 		code = ''.join(random.choice(string.ascii_uppercase + string.digits + string.ascii_lowercase) for x in range(35))
-		author = Author(user = user, name = cleaned_data['author_name'], description = cleaned_data['author_description'], confirmation_code = code)
+		author = UserProfile(user = user, name = cleaned_data['author_name'], description = cleaned_data['author_description'], confirmation_code = code)
 		user.save()
 		author.save()
 
@@ -151,39 +162,46 @@ class ResetPasswordForm(forms.Form):
 class AccountForm(ModelForm):
 	class Meta:
 		model = User
-		exclude = ('username', 'password', 'email', 'first_name', 'last_name', 'is_staff', 'is_active', 'is_superuser', 'last_login', 'date_joined',
+		exclude = ('username', 'email', 'first_name', 'last_name', 'is_staff', 'is_active', 'is_superuser', 'last_login', 'date_joined',
 			'groups', 'user_permissions')
 
-		fields = ['passw', 'pass_check', 'email', 'author_name', 'author_description']	
-
-	passw = forms.CharField(label='Password',widget=forms.PasswordInput,min_length=6)
+		fields = ['pass_check', 'email', 'author_name', 'author_description']
+		
 	pass_check = forms.CharField(label='Re-type password',widget=forms.PasswordInput)
 	author_name = forms.CharField(max_length=100)
 	author_description = forms.CharField(label='Description',widget=forms.Textarea)
+	
+	def clean_author_name(self):
+		author_name = self.cleaned_data['author_name']
+		
+		try:
+			check = UserProfile.objects.get(name__iexact=self.cleaned_data['author_name'])
+			
+			raise ValidationError('This name has already been taken, please choose another.')
+		except UserProfile.DoesNotExist:
+			pass
+	
+		return author_name
+	
+	def clean_password(self):
+		password = self.cleaned_data['password']
+		
+		if len(password) < 6:
+			raise ValidationError('Password must be at least 6 characters long (currently %s).' % (len(password)))
+		
+		return password
 
 	def clean(self):
 		cleaned_data = super(AccountForm, self).clean()
-		
-		try:
-			if 'author_name' in cleaned_data:
-				check = Author.objects.get(name__iexact=cleaned_data['author_name'])
-		except ObjectDoesNotExist:
-			pass
-		else:
-			if not self._errors.has_key('author_name'):
-				self._errors['author_name'] = ErrorList()
-				self._errors["author_name"].append(u'This name has already been taken, please choose another.')
 
-		if 'passw' in cleaned_data:
+		password = cleaned_data.get("password")
+		pass_check = cleaned_data.get("pass_check")
 
-			password1 = cleaned_data['passw']
-			password2 = cleaned_data['pass_check']
-
-			if password1 != password2:
-				if not self._errors.has_key('pass_check'):
-					self._errors['pass_check'] = ErrorList()
-					self._errors['pass_check'].append(u'Passwords must match!')
-
+		if password != pass_check:
+			if not self._errors.has_key('pass_check'):
+				self._errors['pass_check'] = ErrorList()
+				self._errors["pass_check"].append(u'Passwords must match!')
+	
 		return cleaned_data
 
 	def save(self):
@@ -191,10 +209,10 @@ class AccountForm(ModelForm):
 
 		cleaned_data = self.cleaned_data
 
-		instance.set_password(cleaned_data['passw'])
+		instance.set_password(cleaned_data['password'])
 
-		instance.author.name = cleaned_data['author_name']
-		instance.author.description = cleaned_data['author_description']
+		instance.user.name = cleaned_data['author_name']
+		instance.user.description = cleaned_data['author_description']
 
 		instance.save()
 
