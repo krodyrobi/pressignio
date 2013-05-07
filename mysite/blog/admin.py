@@ -12,10 +12,10 @@ class UserAdmin(UserAdmin):
 
 class ArticleAdmin(admin.ModelAdmin):
 	fieldsets = [
-		('Header', {'fields': ['title', 'author', 'publication_date']}),
+		('Header', {'fields': ['title', 'author']}),
 		('Body', {'fields': ['text']})
 	]
-	list_display = ('title', 'author', 'publication_date')
+	list_display = ('title', 'author')
 
 admin.site.unregister(User)
 admin.site.register(User, UserAdmin)

@@ -15,7 +15,6 @@ import random
 
 
 def sendValidationEmail(user, author):
-
 	title = "Pressignio account confirmation:"
 	content = "localhost:8000/blog/confirm/%s/%s/" % (author.confirmation_code, user.username)
 	send_mail(title, content, 'pressignio-bot@presslabs.com', [user.email], fail_silently=False)
@@ -84,6 +83,8 @@ class RegisterForm(forms.Form):
 			if not self._errors.has_key('author_name'):
 				self._errors['author_name'] = ErrorList()
 				self._errors["author_name"].append(u'This name has already been taken, please choose another.')
+
+		
 		
 		password = cleaned_data.get("password")
 		pass_check = cleaned_data.get("pass_check")

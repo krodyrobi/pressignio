@@ -1,6 +1,6 @@
 from django.contrib.auth.models import User
 from django.db import models
-from django.db.models.signals import pre_save
+from django.db.models.signals import pre_save, post_save
 from django.template.defaultfilters import slugify
 from django.utils import timezone
 from django import forms
@@ -21,7 +21,7 @@ class Article(models.Model):
 	slug = models.SlugField()
 	text = models.TextField()
 	author = models.ForeignKey(Author)
-	publication_date = models.DateTimeField()
+	publication_date = models.DateTimeField(auto_now_add=True)
 	
 	def __unicode__(self):
 		return self.title + ' - ' + self.author.name
@@ -30,6 +30,12 @@ def set_slug_author(sender, instance, *args, **kwargs):
 	instance.slug = slugify(instance.name)
 
 pre_save.connect(set_slug_author, sender=Author)
+
+def create_user_profile(sender, instance, created, **kwargs):
+    if created:
+        Article.objects.create(user=instance)
+
+post_save.connect(create_user_profile, sender=User)
 
 def set_slug_article(sender, instance, *args, **kwargs):
 	instance.slug = slugify(instance.title)

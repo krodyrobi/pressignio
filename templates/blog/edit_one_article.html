@@ -6,11 +6,13 @@
 
 {% block content %}
   <h1>Edit</h1>
-  {% if is_good %}
-  <div class="alert alert-success">  
-    <a class="close" data-dismiss="alert">×</a>  
-    <strong>Saved.</strong> Your edits have been saved successfully.  
-  </div>
+  {% if messages %}
+    {% for message in messages %}
+    <div class="alert alert-success">  
+      <a class="close" data-dismiss="alert">×</a>  
+      <strong>Saved.</strong> {{ message }}
+    </div>
+    {% endfor %}
   {% endif %}
   <form class="form-horizontal" action="/blog/myarticles/edit/{{ article_pk }}/" method="post">{% csrf_token %}
     <div class="control-group{% if form.title.errors%} error{% endif %}">
