@@ -5,8 +5,8 @@ from django.template.defaultfilters import slugify
 from django.utils import timezone
 from django import forms
 
-class Author(models.Model):
-	user = models.OneToOneField(User)
+class UserProfile(models.Model):
+	user = models.ForeignKey(User, unique = True)
 	name = models.CharField(max_length=100)
 	slug = models.SlugField()
 	description = models.TextField()
@@ -22,6 +22,7 @@ class Article(models.Model):
 	text = models.TextField()
 	author = models.ForeignKey(Author)
 	publication_date = models.DateTimeField(auto_now_add=True)
+
 	
 	def __unicode__(self):
 		return self.title + ' - ' + self.author.name
@@ -29,7 +30,7 @@ class Article(models.Model):
 def set_slug_author(sender, instance, *args, **kwargs):
 	instance.slug = slugify(instance.name)
 
-pre_save.connect(set_slug_author, sender=Author)
+pre_save.connect(set_slug_author, sender=UserProfile)
 
 def create_user_profile(sender, instance, created, **kwargs):
     if created:
