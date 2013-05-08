@@ -13,7 +13,6 @@
     </div>
     {% endfor %}
   {% endif %} 
-  
   <form class="form-horizontal" action="/blog/resend/" method="post">{% csrf_token %}
     <div class="control-group{% if form.email.errors%} error{% endif %}">
       <label class="control-label" for="id_email">Email</label>
