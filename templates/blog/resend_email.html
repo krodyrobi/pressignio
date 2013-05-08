@@ -5,13 +5,14 @@
 
 {% block content %}
   <h1>Resend code</h1>
-  {% if is_good %}
-  <div class="alert alert-success">  
-    <a class="close" data-dismiss="alert">×</a>  
-    <strong>Success.</strong> An email has been sent to that email address.
-  </div>
-  {% endif %}
-  
+  {% if messages %}
+    {% for message in messages %}
+    <div class="alert alert-{% if message.tags == 'error' %}error{% else %}success{% endif %}">  
+      <a class="close" data-dismiss="alert">×</a> 
+      <strong>{% if message.tags == 'error' %}Error!{% else %}Success.{% endif %}</strong> {{ message }}
+    </div>
+    {% endfor %}
+  {% endif %} 
   
   <form class="form-horizontal" action="/blog/resend/" method="post">{% csrf_token %}
     <div class="control-group{% if form.email.errors%} error{% endif %}">

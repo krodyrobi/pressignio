@@ -26,10 +26,10 @@ def registerUser(request):
 			
 			if form.is_valid():
 				data = form.cleaned_data
-				user,author = form.save()
-				sendValidationEmail(user,author)
+				author = form.save()
+				sendValidationEmail(author)
 				message = ' Account has been created, to complete the registration process go to the link sent to your email adress (%s)' %(data['email'])
-				request.session['message'] = message
+				messages.add_message(request, messages.INFO, message)
 				
 				return redirect(reverse('login_user'))
 			else: 
@@ -44,10 +44,9 @@ def resendEmailValidation(request):
 	if request.method == 'POST':
 		form = EmailResendForm(request.POST)
 		if form.is_valid():
-			author = Author.objects.get(user__email = form.cleaned_data['email'])
-			user = User.objects.get(id = author.user_id)
+			author = UserProfile.objects.get(user__email = form.cleaned_data['email'])
 
-			form.resend(user, author)
+			form.resend(author)
 			return render_to_response('blog/resend_email.html', {'form': form, 'is_good': True}, context_instance=RequestContext(request))
 		else:
 			return render_to_response('blog/resend_email.html', {'form': form, 'error': True}, context_instance=RequestContext(request))
@@ -56,21 +55,21 @@ def resendEmailValidation(request):
 		return render_to_response('blog/resend_email.html', {'form': form}, context_instance=RequestContext(request))
 
 		
-def confirm(request, username, confirmation_code):
+def confirm(request, confirmation_code):
 	if request.method == 'GET':
 
 		try:
-			user = User.objects.get(username = username, author__confirmation_code = confirmation_code, is_active = False)
+			author = UserProfile.objects.get(confirmation_code = confirmation_code, user__is_active = False)
 		except ObjectDoesNotExist:
-			message_error = ' Wrong activation link. Try again!'
-			request.session['message_error'] = message_error
+			message = ' Wrong activation link. Try again!'
+			messages.add_message(request, messages.ERROR, message)
 			return redirect(reverse('login_user'))
 
-		user.is_active = True
-		user.save()
+		author.user.is_active = True
+		author.user.save()
 		
 		message = ' Account succesfully activated.'
-		request.session['message'] = message
+		messages.add_message(request, messages.INFO, message)
 		
 		return redirect(reverse('login_user'))
 				
@@ -96,19 +95,19 @@ def resetPassword(request):
 	else:
 		raise Http404
 		
-def passwordRecovery(request, username, recovery_code):
+def passwordRecovery(request, recovery_code):
 	if request.user.is_anonymous():
 		if request.method == 'GET':
 			try:
-					user = User.objects.get(username = username, author__recovery_code = recovery_code)
-			except ObjectDoesNotExist:
-				message_error = ' Wrong recovery link. Try again!'
-				request.session['message_error'] = message_error
+				author = UserProfile.objects.get(recovery_code = recovery_code)
+			except UserProfile.DoesNotExist:
+				message = ' Wrong recovery link. Try again!'
+				messages.add_message(request, messages.ERROR, message)
 				return redirect(reverse('login_user'))
 			else:
-				sendRetrievePasswordEmail(user)
-				message = ' Password reset successfull check your email for the new password. (%s)' % (user.email)
-				request.session['message'] = message
+				sendRetrievePasswordEmail(author.user)
+				message = ' Check your email for the reset link. (%s)' % (author.user.email)
+				messages.add_message(request, messages.INFO, message) 
 				return redirect(reverse('login_user'))
 		else:
 			raise Http404
@@ -147,15 +146,6 @@ def login_user(request):
 						context_instance=RequestContext(request))
 		else:
 			form = LoginForm()
-		
-			if 'message' in request.session:
-				messages.add_message(request, messages.INFO, 
-				request.session['message'])
-				del request.session['message']
-			if 'message_error' in request.session:
-				messages.add_message(request, messages.ERROR, 
-				request.session['message_error'])
-				del request.session['message_error']
 		
 			return render_to_response('blog/login.html', {'form': form},
 				context_instance=RequestContext(request))

@@ -20,7 +20,7 @@ class Article(models.Model):
 	title = models.CharField(max_length=200)
 	slug = models.SlugField()
 	text = models.TextField()
-	author = models.ForeignKey(Author)
+	author = models.ForeignKey(UserProfile)
 	publication_date = models.DateTimeField(auto_now_add=True)
 
 	
@@ -31,12 +31,6 @@ def set_slug_author(sender, instance, *args, **kwargs):
 	instance.slug = slugify(instance.name)
 
 pre_save.connect(set_slug_author, sender=UserProfile)
-
-def create_user_profile(sender, instance, created, **kwargs):
-    if created:
-        Article.objects.create(user=instance)
-
-post_save.connect(create_user_profile, sender=User)
 
 def set_slug_article(sender, instance, *args, **kwargs):
 	instance.slug = slugify(instance.title)
