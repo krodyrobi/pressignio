@@ -45,7 +45,7 @@
               <li class="divider-vertical"></li>
               {% else %}
               <li class="divider-vertical"></li>
-              <li><a>Hello, {{ user.author.name }}.</a></li>
+              <li><a>Hello, {{ user.get_profile.name }}.</a></li>
               <li class="divider-vertical"></li>
               <li{% block account_link %}{% endblock %}><a href="/blog/myaccount">My Account</a></li>
               <li class="divider-vertical"></li>
