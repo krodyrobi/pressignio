@@ -15,11 +15,18 @@
     {% endfor %}
   {% endif %}
   <form class="form-horizontal" action="/blog/myaccount/" method="post">{% csrf_token %}
-    <div class="control-group{% if form.passw.errors%} error{% endif %}">
-      <label class="control-label" for="id_passw">Password</label>
+    <div class="control-group{% if form.password.errors%} error{% endif %}">
+      <label class="control-label" for="id_password">Password</label>
       <div class="controls">
-        <input type="password" id="id_passw" name="passw">
-        <span class="help-inline">{{ form.passw.errors|removetags:"li" }}</span>
+        <input type="password" id="id_password" name="password">
+        <span class="help-inline">{{ form.password.errors|removetags:"li" }}</span>
+      </div>
+    </div>
+    <div class="control-group{% if form.newpass.errors%} error{% endif %}">
+      <label class="control-label" for="id_newpass">New password</label>
+      <div class="controls">
+        <input type="password" id="id_newpass" name="newpass">
+        <span class="help-inline">{{ form.newpass.errors|removetags:"li" }}</span>
       </div>
     </div>
     <div class="control-group{% if form.pass_check.errors%} error{% endif %}">
@@ -29,18 +36,18 @@
         <span class="help-inline">{{ form.pass_check.errors|removetags:"li" }}</span>
       </div>
     </div>
-    <div class="control-group{% if form.author_name.errors%} error{% endif %}">
-      <label class="control-label" for="id_author_name">Author name</label>
+    <div class="control-group{% if form.name.errors%} error{% endif %}">
+      <label class="control-label" for="id_name">Author name</label>
       <div class="controls">
-        <input type="text" id="id_author_name" name="author_name" placeholder="Author Name" value="{% if form.author_name.value != None %}{{ form.author_name.value }}{% endif %}">
-        <span class="help-inline">{{ form.author_name.errors|removetags:"li" }}</span>
+        <input type="text" id="id_name" name="name" placeholder="Author Name" value="{% if form.name.value != None %}{{ form.name.value }}{% endif %}">
+        <span class="help-inline">{{ form.name.errors|removetags:"li" }}</span>
       </div>
     </div>
-    <div class="control-group{% if form.author_description.errors%} error{% endif %}">
-      <label class="control-label" for="id_author_description">Author Description</label>
+    <div class="control-group{% if form.description.errors%} error{% endif %}">
+      <label class="control-label" for="id_description">Author Description</label>
       <div class="controls">
-        <textarea id="id_author_description" rows="4" name="author_description" placeholder="Author Description">{% if form.author_description.value != None %}{{ form.author_description.value }}{% endif %}</textarea>
-        <span class="help-inline">{{ form.author_description.errors|removetags:"li" }}</span>
+        <textarea id="id_description" rows="4" name="description" placeholder="Author Description">{% if form.description.value != None %}{{ form.description.value }}{% endif %}</textarea>
+        <span class="help-inline">{{ form.description.errors|removetags:"li" }}</span>
       </div>
     </div>
     <div class="control-group">

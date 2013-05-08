@@ -5,6 +5,7 @@ from django import forms
 from django.forms import ModelForm, ValidationError
 from django.forms.util import ErrorList
 from django.db.models import Q
+from django.contrib.auth import authenticate
 
 
 from blog.models import Article, UserProfile
@@ -153,43 +154,43 @@ class ResetPasswordForm(forms.Form):
 
 class AccountForm(ModelForm):
 	class Meta:
-		model = User
-		exclude = ('username', 'email', 'first_name', 'last_name', 'is_staff', 'is_active', 'is_superuser', 'last_login', 'date_joined',
-			'groups', 'user_permissions')
-
-		fields = ['pass_check', 'email', 'author_name', 'author_description']
-		
-	pass_check = forms.CharField(label='Re-type password',widget=forms.PasswordInput)
-	author_name = forms.CharField(max_length=100)
-	author_description = forms.CharField(label='Description',widget=forms.Textarea)
+		model = UserProfile
+		exclude = ('user', 'slug', 'confirmation_code', 'recovery_code')
 	
-	def clean_author_name(self):
-		author_name = self.cleaned_data['author_name']
+	password = forms.CharField(label='Password',widget=forms.PasswordInput, min_length=6)
+	
+	newpass = forms.CharField(required=False, label='New password',widget=forms.PasswordInput, min_length=6)
+	pass_check = forms.CharField(required=False, label='Re-type password',widget=forms.PasswordInput)
+	
+	def clean_name(self):
+		name = self.cleaned_data['name']
 		
-		try:
-			check = UserProfile.objects.get(name__iexact=self.cleaned_data['author_name'])
-			
+		check = UserProfile.objects.filter(name__iexact=self.cleaned_data['name']).exclude(user__username = self.instance.user.username)
+		
+		if check:	
 			raise ValidationError('This name has already been taken, please choose another.')
-		except UserProfile.DoesNotExist:
-			pass
 	
-		return author_name
-	
+		return name
+		
 	def clean_password(self):
 		password = self.cleaned_data['password']
 		
-		if len(password) < 6:
-			raise ValidationError('Password must be at least 6 characters long (currently %s).' % (len(password)))
+		user = authenticate(username= self.instance.user.username, password= password)
 		
+		if user == None:
+			raise ValidationError('Wrong password')
+			
 		return password
 
 	def clean(self):
 		cleaned_data = super(AccountForm, self).clean()
 
 		password = cleaned_data.get("password")
+		newpass = cleaned_data.get("newpass")
 		pass_check = cleaned_data.get("pass_check")
-
-		if password != pass_check:
+		
+		
+		if newpass != pass_check and newpass != '':
 			if not self._errors.has_key('pass_check'):
 				self._errors['pass_check'] = ErrorList()
 				self._errors["pass_check"].append(u'Passwords must match!')
@@ -200,13 +201,15 @@ class AccountForm(ModelForm):
 		instance = super(AccountForm, self).save(self)
 
 		cleaned_data = self.cleaned_data
+		
+		
+		if 'newpass' in cleaned_data and cleaned_data['newpass']:
+			instance.user.set_password(cleaned_data['newpass'])
 
-		instance.set_password(cleaned_data['password'])
+		instance.name = cleaned_data['name']
+		instance.description = cleaned_data['description']
 
-		instance.user.name = cleaned_data['author_name']
-		instance.user.description = cleaned_data['author_description']
-
-		instance.save()
+		instance.user.save()
 
 class LoginForm(forms.Form):
 	username = forms.CharField(max_length=30)
