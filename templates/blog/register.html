@@ -35,18 +35,18 @@
         <span class="help-inline">{{ form.email.errors|removetags:"li" }}</span>
       </div>
     </div>
-    <div class="control-group{% if form.author_name.errors%} error{% endif %}">
-      <label class="control-label" for="id_author_name">Author Name</label>
+    <div class="control-group{% if form.name.errors%} error{% endif %}">
+      <label class="control-label" for="id_name">Author Name</label>
       <div class="controls">
-        <input type="text" id="id_author_name" name="author_name" placeholder="Author Name" value="{% if form.author_name.value != None %}{{ form.author_name.value }}{% endif %}">
-        <span class="help-inline">{{ form.author_name.errors|removetags:"li" }}</span>
+        <input type="text" id="id_name" name="name" placeholder="Author Name" value="{% if form.name.value != None %}{{ form.name.value }}{% endif %}">
+        <span class="help-inline">{{ form.name.errors|removetags:"li" }}</span>
       </div>
     </div>
-    <div class="control-group{% if form.author_description.errors%} error{% endif %}">
-      <label class="control-label" for="id_author_description">Author Description</label>
+    <div class="control-group{% if form.description.errors%} error{% endif %}">
+      <label class="control-label" for="id_description">Author Description</label>
       <div class="controls">
-        <textarea id="id_author_description" rows="4" name="author_description" placeholder="Description">{% if form.author_description.value != None %}{{ form.author_description.value }}{% endif %}</textarea>
-        <span class="help-inline">{{ form.author_description.errors|removetags:"li" }}</span>
+        <textarea id="id_description" rows="4" name="description" placeholder="Description">{% if form.description.value != None %}{{ form.description.value }}{% endif %}</textarea>
+        <span class="help-inline">{{ form.description.errors|removetags:"li" }}</span>
       </div>
     </div>
     <div class="control-group">

@@ -15,14 +15,15 @@ import random
 import re
 
 
-def sendValidationEmail(user, author):
+def sendValidationEmail(author):
+	user = author.user
 	title = "Pressignio account confirmation:"
-	content = "localhost:8000/blog/confirm/%s/%s/" % (author.confirmation_code, user.username)
+	content = "localhost:8000/blog/confirm/%s/" % (author.confirmation_code)
 	send_mail(title, content, 'pressignio-bot@presslabs.com', [user.email], fail_silently=False)
 	
 def sendPasswordRecoveryConfirm(user):
 	title = "Pressignio password recovery:"
-	content = "localhost:8000/blog/passwordRecovery/%s/%s/" % (user.author.recovery_code, user.username)
+	content = "localhost:8000/blog/passwordRecovery/%s/" % (user.get_profile().recovery_code)
 	send_mail(title, content, 'pressignio-bot@presslabs.com', [user.email], fail_silently=False)
 	
 def sendRetrievePasswordEmail(user):
@@ -36,14 +37,13 @@ def sendRetrievePasswordEmail(user):
 
 class RegisterForm(ModelForm):
 	class Meta:
-		model = User
-		exclude = ('first_name', 'last_name', 'is_staff', 'email', 'is_active', 'is_superuser', 'last_login', 'date_joined',
-			'groups', 'user_permissions')
+		model = UserProfile
+		exclude = ('user', 'slug', 'confirmation_code', 'recovery_code')
 	
+	username = forms.CharField(label='Username',max_length=30)
+	password = forms.CharField(label='Password',widget=forms.PasswordInput, min_length=6)
 	pass_check = forms.CharField(label='Re-type password',widget=forms.PasswordInput)
 	email = forms.CharField(label='Email')
-	author_name = forms.CharField(max_length=100)
-	author_description = forms.CharField(label='Description',widget=forms.Textarea)
 		
 	def clean_username(self):
 		username = self.cleaned_data['username']
@@ -59,15 +59,7 @@ class RegisterForm(ModelForm):
 			pass		
 		
 		return username
-		
-	def clean_password(self):
-		password = self.cleaned_data['password']
-		
-		if len(password) < 6:
-			raise ValidationError('Password must be at least 6 characters long (currently %s).' % (len(password)))
-		
-		return password
-		
+
 	def clean_email(self):
 		email = self.cleaned_data['email']
 		
@@ -80,17 +72,17 @@ class RegisterForm(ModelForm):
 		
 		return email
 		
-	def clean_author_name(self):
-		author_name = self.cleaned_data['author_name']
+	def clean_name(self):
+		name = self.cleaned_data['name']
 		
 		try:
-			check = UserProfile.objects.get(name__iexact=self.cleaned_data['author_name'])
+			check = UserProfile.objects.get(name__iexact=self.cleaned_data['name'])
 			
 			raise ValidationError('This name has already been taken, please choose another.')
 		except UserProfile.DoesNotExist:
 			pass
 	
-		return author_name
+		return name
 		
 	def clean(self):
 		cleaned_data = super(RegisterForm, self).clean()
@@ -109,14 +101,14 @@ class RegisterForm(ModelForm):
 		cleaned_data = self.cleaned_data
 		
 		user = User.objects.create_user(username = cleaned_data['username'], email = cleaned_data['email'], password = cleaned_data['password'])
-		user.is_active = False
+		user.is_active = False 
 		
 		code = ''.join(random.choice(string.ascii_uppercase + string.digits + string.ascii_lowercase) for x in range(35))
-		author = UserProfile(user = user, name = cleaned_data['author_name'], description = cleaned_data['author_description'], confirmation_code = code)
+		author = UserProfile.objects.create(user = user, name = cleaned_data['name'], description = cleaned_data['description'], confirmation_code = code)
 		user.save()
 		author.save()
 
-		return user,author
+		return author
 
 
 class EmailResendForm(forms.Form):
@@ -125,16 +117,16 @@ class EmailResendForm(forms.Form):
 	def clean_email(self):
 		email = self.cleaned_data['email']
 		try:
-			check = Author.objects.get(user__email=email, user__is_active=False)
-		except ObjectDoesNotExist:
+			check = UserProfile.objects.get(user__email=email, user__is_active=False)
+		except UserProfile.DoesNotExist:
 			if not self._errors.has_key('email'):
 				self._errors['email'] = ErrorList()
 				self._errors['email'].append(u'Email not found or user already active!')
 			
 		return email
     	
-	def resend(self, user, author):
-		sendValidationEmail(user,author)
+	def resend(self, author):
+		sendValidationEmail(author)
 		
 class ResetPasswordForm(forms.Form):
 	username_email = forms.CharField(max_length=30, label= "Username")
@@ -153,8 +145,9 @@ class ResetPasswordForm(forms.Form):
 		return cleaned_data
 		
 	def send(self,user):
-		user.author.recovery_code = ''.join(random.choice(string.ascii_uppercase + string.digits + string.ascii_lowercase) for x in range(35))
-		user.author.save()
+		author = user.get_profile()
+		author.recovery_code = ''.join(random.choice(string.ascii_uppercase + string.digits + string.ascii_lowercase) for x in range(35))
+		author.save()
 		sendPasswordRecoveryConfirm(user)
 
 
