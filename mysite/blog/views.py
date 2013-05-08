@@ -176,20 +176,21 @@ def edit_account(request):
 	user = request.user
 
 	if request.method == 'POST':
-		form = AccountForm(request.POST, instance=user)
+		form = AccountForm(request.POST, instance=user.get_profile())
 
 		if form.is_valid():
 			form.save()
-
-		messages.add_message(request, messages.INFO, 
+			
+			messages.add_message(request, messages.INFO, 
 			'Your edits have been saved successfully.')
 
 		return render_to_response('blog/edit_account.html', 
 				{'form': form},
 				context_instance=RequestContext(request))
 	else:
-		form = AccountForm(instance=user, initial={'author_name': user.author.name,
-			'author_description': user.author.description})
+		author = user.get_profile()
+		form = AccountForm(instance=user.get_profile(), initial={'name': author.name,
+			'description': author.description})
 
 		return render_to_response('blog/edit_account.html', 
 				{'form': form},
