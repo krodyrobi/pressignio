@@ -7,12 +7,17 @@ from django.db.models import Q
 from django.http import Http404, HttpResponseForbidden
 from django.shortcuts import get_object_or_404, render, render_to_response, redirect
 from django.template import RequestContext
+from django.utils.safestring import mark_safe
 from django.views.decorators.http import require_POST
 
-from blog.forms import LoginForm, RegisterForm, ArticleForm, EditForm, DeleteForm, AccountForm, EmailResendForm, ResetPasswordForm, sendValidationEmail, sendRetrievePasswordEmail
+from blog.forms import LoginForm, RegisterForm, ArticleForm,\
+	EditForm, DeleteForm, AccountForm, EmailResendForm, ResetPasswordForm,\
+	sendValidationEmail, sendRetrievePasswordEmail
 from blog.models import Article, UserProfile
 
 import datetime
+import random
+import string
 
 def index(request):
 	latest_articles_list = Article.objects.all().order_by('-publication_date')[:10]
@@ -51,8 +56,6 @@ def resendEmailValidation(request):
 			messages.add_message(request, messages.INFO, message)
 			return render_to_response('blog/resend_email.html', {'form': form}, context_instance=RequestContext(request))
 		else:
-			message = 'Either user is already active or link is invalid.'
-			messages.add_message(request, messages.ERROR, message)
 			return render_to_response('blog/resend_email.html', {'form': form}, context_instance=RequestContext(request))
 	else:
 		form = 	EmailResendForm()	
@@ -129,9 +132,9 @@ def login_user(request):
 						return redirect(reverse('index'))
 					else:
 						messages.add_message(request, messages.ERROR, 
-							'''Account not activated yet, check your
+							mark_safe('''Account not activated yet, check your
 							 email for the validation link. <a href="
-							/blog/resend/">Not there? Resend it here!</a>''')
+							/blog/resend/">Not there? Resend it here!</a>'''))
 
 						return render_to_response('blog/login.html', {'form': form},
 						context_instance=RequestContext(request))
