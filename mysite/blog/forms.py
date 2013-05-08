@@ -105,7 +105,7 @@ class RegisterForm(ModelForm):
 		user.is_active = False 
 		
 		code = ''.join(random.choice(string.ascii_uppercase + string.digits + string.ascii_lowercase) for x in range(35))
-		author = UserProfile.objects.create(user = user, name = cleaned_data['name'], description = cleaned_data['description'], confirmation_code = code)
+		author = UserProfile.objects.create(user = user, name = cleaned_data['name'], description = cleaned_data['description'], confirmation_code = code, )
 		user.save()
 		author.save()
 

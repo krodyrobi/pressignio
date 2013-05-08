@@ -105,6 +105,10 @@ def passwordRecovery(request, recovery_code):
 			return redirect(reverse('login_user'))
 		else:
 			sendRetrievePasswordEmail(author.user)
+			
+			code = ''.join(random.choice(string.ascii_uppercase + string.digits + string.ascii_lowercase) for x in range(35))
+			author.recovery_code = code
+			
 			message = 'Check your email for the reset link. (%s)' % (author.user.email)
 			messages.add_message(request, messages.INFO, message) 
 			return redirect(reverse('login_user'))
@@ -161,7 +165,7 @@ def detail(request, title_slug, year, month):
 		context_instance=RequestContext(request))
 
 def author(request, name_slug):
-	author = get_object_or_404(Author, slug=name_slug)
+	author = get_object_or_404(UserProfile, slug=name_slug)
 	latest_articles_list = Article.objects.filter(author=author).order_by('-publication_date')[:3]
 	return render_to_response('blog/author.html', {'author': author,
 		'latest_articles_list': latest_articles_list},
