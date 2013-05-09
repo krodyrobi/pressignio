@@ -3,9 +3,9 @@
 
 {% block account_link %} class="active"{% endblock %}
 
-{% block title %} - {% trans 'My account' %}{% endblock %}
+{% block title %} - {% trans 'My Account' %}{% endblock %}
 
-{% block heading %}<h1>{% trans 'My account' %}</h1>{% endblock %}
+{% block heading %}<h1>{% trans 'My Account' %}</h1>{% endblock %}
 {% block content %}
   <form class="form-horizontal" action="/blog/myaccount/" method="post">{% csrf_token %}
     <div class="control-group{% if form.password.errors%} error{% endif %}">

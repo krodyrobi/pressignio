@@ -3,7 +3,7 @@
 
 {% block articles_link %} class="active"{% endblock %}
 
-{% block title %} - {% trans 'My articles' %}{% endblock %}
+{% block title %} - {% trans 'My Articles' %}{% endblock %}
 
 {% block content %}
   <form action="/blog/myarticles/edit/" method="post">{% csrf_token %}
@@ -23,7 +23,7 @@
 	  <form class="form-inline" action="/blog/myarticles/delete/" method="post">{% csrf_token %}
 	    <input for="id_pk" type="hidden" name="pk" value="{{ article.pk }}" />
 	    <input for="id_page" type="hidden" name="page" value="{{ page }}" />
-	    <input type="submit" class="btn btn-danger" value="Yes"></input>
+	    <input type="submit" class="btn btn-danger" value="{% trans 'Yes' %}"></input>
 	    <button class="btn btn-cancel" data-dismiss="modal" aria-hidden="true">{% trans 'No' %}</button>
 	  </form>
     </div>
