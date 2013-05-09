@@ -5,7 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
 from django.db.models import Q
 from django.http import Http404, HttpResponseForbidden
-from django.shortcuts import get_object_or_404, render, render_to_response, redirect
+from django.shortcuts import get_object_or_404, render_to_response, redirect
 from django.template import RequestContext
 from django.utils.safestring import mark_safe
 from django.views.decorators.http import require_POST
@@ -15,7 +15,6 @@ from blog.forms import LoginForm, RegisterForm, ArticleForm,\
 	sendValidationEmail, sendRetrievePasswordEmail
 from blog.models import Article, UserProfile
 
-import datetime
 import random
 import string
 
