@@ -1,57 +1,59 @@
 {% extends "blog/base.html" %}
+{% load i18n %}
 
 {% block register_link %} class="active"{% endblock %}
 
-{% block title %} - Register{% endblock %}
+{% block title %} - {% trans 'Register' %}{% endblock %}
+
+{% block heading %}<h1>{% trans 'Register' %}</h1>{% endblock %}
 
 {% block content %}
-  <h1>Register</h1>
   <form class="form-horizontal" action="/blog/register/" method="post">{% csrf_token %}
     <div class="control-group{% if form.username.errors%} error{% endif %}">
-      <label class="control-label" for="id_username">Username</label>
+      <label class="control-label" for="id_username">{% trans 'Username' %}</label>
       <div class="controls">
-        <input type="text" id="id_username" name="username" placeholder="Username" value="{% if form.username.value != None %}{{ form.username.value }}{% endif %}">
+        <input type="text" id="id_username" name="username" placeholder="{% trans 'Username' %}" value="{% if form.username.value != None %}{{ form.username.value }}{% endif %}">
         <span class="help-inline">{{ form.username.errors|removetags:"li" }}</span>
       </div>
     </div>
     <div class="control-group{% if form.password.errors%} error{% endif %}">
-      <label class="control-label" for="id_password">Password</label>
+      <label class="control-label" for="id_password">{% trans 'Password' %}</label>
       <div class="controls">
-        <input type="password" id="id_password" name="password" placeholder="Password">
+        <input type="password" id="id_password" name="password" placeholder="{% trans 'Password' %}">
         <span class="help-inline">{{ form.password.errors|removetags:"li" }}</span>
       </div>
     </div>
     <div class="control-group{% if form.pass_check.errors%} error{% endif %}">
-      <label class="control-label" for="id_pass_check">Re-type password</label>
+      <label class="control-label" for="id_pass_check">{% trans 'Re-type password' %}</label>
       <div class="controls">
-        <input type="password" id="id_pass_check" name="pass_check" placeholder="Re-type password">
+        <input type="password" id="id_pass_check" name="pass_check" placeholder="{% trans 'Re-type password' %}">
         <span class="help-inline">{{ form.pass_check.errors|removetags:"li" }}</span>
       </div>
     </div>
     <div class="control-group{% if form.email.errors%} error{% endif %}">
-      <label class="control-label" for="id_email">Email</label>
+      <label class="control-label" for="id_email">{% trans 'Email' %}</label>
       <div class="controls">
-        <input type="email" id="id_email" name="email" placeholder="Email" value="{% if form.email.value != None %}{{ form.email.value }}{% endif %}">
+        <input type="email" id="id_email" name="email" placeholder="{% trans 'Email' %}" value="{% if form.email.value != None %}{{ form.email.value }}{% endif %}">
         <span class="help-inline">{{ form.email.errors|removetags:"li" }}</span>
       </div>
     </div>
     <div class="control-group{% if form.name.errors%} error{% endif %}">
-      <label class="control-label" for="id_name">Author Name</label>
+      <label class="control-label" for="id_name">{% trans 'Author Name' %}</label>
       <div class="controls">
-        <input type="text" id="id_name" name="name" placeholder="Author Name" value="{% if form.name.value != None %}{{ form.name.value }}{% endif %}">
+        <input type="text" id="id_name" name="name" placeholder="{% trans 'Author Name' %}" value="{% if form.name.value != None %}{{ form.name.value }}{% endif %}">
         <span class="help-inline">{{ form.name.errors|removetags:"li" }}</span>
       </div>
     </div>
     <div class="control-group{% if form.description.errors%} error{% endif %}">
-      <label class="control-label" for="id_description">Author Description</label>
+      <label class="control-label" for="id_description">{% trans 'Author Description' %}</label>
       <div class="controls">
-        <textarea id="id_description" rows="4" name="description" placeholder="Description">{% if form.description.value != None %}{{ form.description.value }}{% endif %}</textarea>
+        <textarea id="id_description" rows="4" name="description" placeholder="{% trans 'Description' %}">{% if form.description.value != None %}{{ form.description.value }}{% endif %}</textarea>
         <span class="help-inline">{{ form.description.errors|removetags:"li" }}</span>
       </div>
     </div>
     <div class="control-group">
       <div class="controls">
-        <button type="submit" class="btn btn-primary">Register</button>
+        <button type="submit" class="btn btn-primary">{% trans 'Register' %}</button>
       </div>
     </div>
   </form>
