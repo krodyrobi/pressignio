@@ -1,29 +1,30 @@
 {% extends "blog/base.html" %}
+{% load i18n %}
 
 {% block articles_link %} class="active"{% endblock %}
 
-{% block title %} - My articles{% endblock %}
+{% block title %} - {% trans 'My articles' %}{% endblock %}
 
 {% block content %}
   <form action="/blog/myarticles/edit/" method="post">{% csrf_token %}
     <input for="id_pk" type="hidden" name="pk" value="0" />
-    <button type="submit" class="btn btn-primary">New Article</button>
+    <button type="submit" class="btn btn-primary">{% trans 'New Article' %}</button>
   </form>
   {% for article in latest_articles_list %}
   <div id="deleteModal-{{ article.pk }}" class="modal hide fade">
     <div class="modal-header">
       <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-      <h3>Confirm</h3>
+      <h3>{% trans 'Confirm' %}</h3>
     </div>
     <div class="modal-body">
-      <p>Are you sure you want to delete the article?</p>
+      <p>{% trans 'Are you sure you want to delete the article?' %}</p>
     </div>
     <div class="modal-footer">
 	  <form class="form-inline" action="/blog/myarticles/delete/" method="post">{% csrf_token %}
 	    <input for="id_pk" type="hidden" name="pk" value="{{ article.pk }}" />
 	    <input for="id_page" type="hidden" name="page" value="{{ page }}" />
 	    <input type="submit" class="btn btn-danger" value="Yes"></input>
-	    <button class="btn btn-cancel" data-dismiss="modal" aria-hidden="true">No</button>
+	    <button class="btn btn-cancel" data-dismiss="modal" aria-hidden="true">{% trans 'No' %}</button>
 	  </form>
     </div>
   </div>
@@ -33,7 +34,7 @@
     <li>
       <form action="/blog/myarticles/edit/" method="post">{% csrf_token %}
         <input for="id_pk" type="hidden" name="pk" value="{{ article.pk }}" />
-        <button type="submit" class="btn btn-info">Edit</button>
+        <button type="submit" class="btn btn-info">{% trans 'Edit' %}</button>
       </form>
     </li>
     <li>
@@ -42,16 +43,16 @@
       <form action="/blog/myarticles/delete/" method="post">{% csrf_token %}
         <input for="id_pk" type="hidden" name="pk" value="{{ article.pk }}" />
         <input for="id_page" type="hidden" name="page" value="{{ page }}" />
-        <input type="submit" class="btn btn-danger" data-toggle="modal" data-target="#deleteModal-{{ article.pk }}" value="Delete"></input>
+        <input type="submit" class="btn btn-danger" data-toggle="modal" data-target="#deleteModal-{{ article.pk }}" value="{% trans 'Delete' %}"></input>
       </form>
     </li>
   </ul>
   <p>{{ article.text|linebreaks|truncatewords:180 }}</p>
   {% endfor %}
   {% if page == 1 %}
-  {% if not last %}<h3><a class="btn" href="/blog/myarticles/page/{{ page|add:1 }}">Next&#62;</a></h3>{% endif %}
+  {% if not last %}<h3><a class="btn" href="/blog/myarticles/page/{{ page|add:1 }}">{% trans 'Next' %}&#62;</a></h3>{% endif %}
   {% else %}
-  <h3><a class="btn" href="/blog/myarticles/page/{{ page|add:-1 }}">&#60;Previous</a>
-    {% if not last %} <a class="btn" href="/blog/myarticles/page/{{ page|add:1 }}">Next&#62;</a>{% endif %}</h3>
+  <h3><a class="btn" href="/blog/myarticles/page/{{ page|add:-1 }}">&#60;{% trans 'Previous' %}</a>
+    {% if not last %} <a class="btn" href="/blog/myarticles/page/{{ page|add:1 }}">{% trans 'Next' %}&#62;</a>{% endif %}</h3>
   {% endif %}
 {% endblock %}

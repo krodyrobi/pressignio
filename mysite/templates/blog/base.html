@@ -61,6 +61,16 @@
       </div>
     </div>
     <div id="content" class="container">
+      {% block heading %}
+      {% endblock %}
+      {% if messages %}
+        {% for message in messages %}
+          <div class="alert alert-{% if message.tags == 'error' %}error{% else %}success{% endif %}">  
+            <a class="close" data-dismiss="alert">×</a> 
+            <strong>{% if message.tags == 'error' %}{% trans 'Error!' %}{% else %}{% trans 'Success.' %}{% endif %}</strong> {{ message }}
+          </div>
+        {% endfor %}
+      {% endif %}
       {% block content %}
       {% endblock %}
     </div>

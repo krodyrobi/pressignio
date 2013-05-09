@@ -2,8 +2,8 @@
 
 {% block title %} - {{ author.name }}{% endblock %}
 
+{% block heading %}<h1>{{ author.name }}</h1>{% endblock %}
 {% block content %}
-  <h1>{{ author.name }}</h1>
   <p>{{ author.description|linebreaks }}</p>
   {% for article in latest_articles_list %}
   <h1><a href="/blog/{{ article.publication_date|date:"Y" }}/{{ article.publication_date|date:"m" }}/{{ article.slug }}">{{ article.title }}</a></h1>
