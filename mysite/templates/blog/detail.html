@@ -2,8 +2,8 @@
 
 {% block title %} - {{ article.title }}{% endblock %}
 
+{% block heading %}<h1>{{ article.title }}</h1>{% endblock %}
 {% block content %}
-  <h1>{{ article.title }}</h1>
   <h3><a href="/blog/{{ article.author.slug }}">{{ article.author }}</a>  -  {{ article.publication_date }}</h3>
   <p>{{ article.text|linebreaks }}</p>
 {% endblock %}
