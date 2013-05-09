@@ -1,5 +1,6 @@
 {% load staticfiles %}
 {% load i18n %}
+
 <!DOCTYPE html>
 <html>
   <head>
@@ -74,6 +75,17 @@
       {% block content %}
       {% endblock %}
     </div>
+    
+    <form action="/i18n/setlang/" method="post">{% csrf_token %}
+	  <input name="next" type="hidden" value="/blog/login" />
+	  <select name="language">
+    	{% for lang in LANGUAGES %}
+    	<option value="{{ lang.0 }}">{{ lang.1 }}</option>
+    	{% endfor %}
+	  </select>
+	  <input type="submit" value="Go" />
+	</form>
+    
     <script src="http://code.jquery.com/jquery.js"></script>
     <script src="{% static "bootstrap/js/bootstrap.min.js" %}"></script>
   </body>
