@@ -1,0 +1,191 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2013-05-10 12:14+0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1)\n"
+
+#: admin/base_site.html:4
+msgid "Pressignio admin"
+msgstr "Pressignio administrateur"
+
+#: admin/base_site.html:7
+msgid "Article administration"
+msgstr "Administration de l'article"
+
+#: blog/base.html:7 blog/base.html.py:28
+msgid "Mysite"
+msgstr "Monsite"
+
+#: blog/base.html:32
+msgid "Home"
+msgstr "Home"
+
+#: blog/base.html:34
+msgid "About"
+msgstr "Sur"
+
+#: blog/base.html:36
+msgid "Contact"
+msgstr "Contactez"
+
+#: blog/base.html:44 blog/login.html:6 blog/login.html.py:8
+#: blog/login.html.py:32
+msgid "Login"
+msgstr "Login"
+
+#: blog/base.html:46 blog/register.html:6 blog/register.html.py:8
+#: blog/register.html.py:56
+msgid "Register"
+msgstr "Inscrivez-vous"
+
+#: blog/base.html:52 blog/edit_account.html:6 blog/edit_account.html.py:8
+msgid "My Account"
+msgstr "Mon Compte"
+
+#: blog/base.html:54 blog/edit_articles.html:6
+msgid "My Articles"
+msgstr "Mes Articles"
+
+#: blog/base.html:56
+msgid "Logout"
+msgstr "Logout"
+
+#: blog/base.html:71
+msgid "Error!"
+msgstr "Erreur!"
+
+#: blog/base.html:71
+msgid "Success."
+msgstr "Succès."
+
+#: blog/edit_account.html:12 blog/login.html:20 blog/login.html.py:22
+#: blog/register.html:20 blog/register.html.py:22
+msgid "Password"
+msgstr "Mot de passe"
+
+#: blog/edit_account.html:19
+msgid "New password"
+msgstr "Nouveau mot de passe"
+
+#: blog/edit_account.html:26 blog/register.html:27 blog/register.html.py:29
+msgid "Re-type password"
+msgstr "Re-type mot de passe"
+
+#: blog/edit_account.html:33
+msgid "Author name"
+msgstr "Nom de l'auteur"
+
+#: blog/edit_account.html:35 blog/register.html:41 blog/register.html.py:43
+msgid "Author Name"
+msgstr "Nom de l'auteur"
+
+#: blog/edit_account.html:40 blog/edit_account.html.py:42
+#: blog/register.html:48
+msgid "Author Description"
+msgstr "Auteur Description"
+
+#: blog/edit_account.html:48 blog/edit_one_article.html:27
+msgid "Save"
+msgstr "Sauvegarder"
+
+#: blog/edit_articles.html:11
+msgid "New Article"
+msgstr "Nouvel article"
+
+#: blog/edit_articles.html:17
+msgid "Confirm"
+msgstr "Confirmez"
+
+#: blog/edit_articles.html:20
+msgid "Are you sure you want to delete the article?"
+msgstr "Etes-vous sûr de vouloir supprimer l'article?"
+
+#: blog/edit_articles.html:26
+msgid "Yes"
+msgstr "Oui"
+
+#: blog/edit_articles.html:27
+msgid "No"
+msgstr "Non"
+
+#: blog/edit_articles.html:37 blog/edit_one_article.html:6
+#: blog/edit_one_article.html.py:8
+msgid "Edit"
+msgstr "Modifier"
+
+#: blog/edit_articles.html:46
+msgid "Delete"
+msgstr "Supprimer"
+
+#: blog/edit_articles.html:53 blog/edit_articles.html.py:56
+msgid "Next"
+msgstr "Suivant"
+
+#: blog/edit_articles.html:55
+msgid "Previous"
+msgstr "Précédent"
+
+#: blog/edit_one_article.html:12 blog/edit_one_article.html.py:14
+msgid "Title"
+msgstr "Titre"
+
+#: blog/edit_one_article.html:19 blog/edit_one_article.html.py:21
+msgid "Content"
+msgstr "Content"
+
+#: blog/login.html:13 blog/login.html.py:15 blog/register.html:13
+#: blog/register.html.py:15
+msgid "Username"
+msgstr "Nom d'utilisateur"
+
+#: blog/login.html:27
+msgid "Password forgotten?"
+msgstr "Mot de passe oublié?"
+
+#: blog/register.html:34 blog/register.html.py:36 blog/resend_email.html:11
+#: blog/resend_email.html.py:13
+msgid "Email"
+msgstr "Email"
+
+#: blog/register.html:50
+msgid "Description"
+msgstr "Description"
+
+#: blog/resend_email.html:4
+msgid "Resend email validation"
+msgstr "Renvoyer validation d'email"
+
+#: blog/resend_email.html:6
+msgid "Resend code"
+msgstr "Renvoyer le code"
+
+#: blog/resend_email.html:19
+msgid "Resend"
+msgstr "Renvoyer"
+
+#: blog/reset_password.html:4 blog/reset_password.html.py:6
+msgid "Password reset"
+msgstr "Mot de passe réinitialisé"
+
+#: blog/reset_password.html:11
+msgid "Username/Email"
+msgstr "Nom d'utilisateur / Email"
+
+#: blog/reset_password.html:19
+msgid "Reset"
+msgstr "Réinitialiser"
+
