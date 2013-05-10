@@ -102,4 +102,4 @@ msgstr "Schlechten Username oder Passwort."
 
 #: views.py:188 views.py:274
 msgid "Your edits have been saved successfully."
-msgstr "Deine Beänderung sind erfolgreich gespeichert."
+msgstr "Deine Beänderungen sind erfolgreich gespeichert."
