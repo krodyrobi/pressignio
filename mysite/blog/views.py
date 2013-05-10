@@ -8,6 +8,7 @@ from django.http import Http404, HttpResponseForbidden
 from django.shortcuts import get_object_or_404, render_to_response, redirect
 from django.template import RequestContext
 from django.utils.safestring import mark_safe
+from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_POST
 
 from blog.forms import LoginForm, RegisterForm, ArticleForm,\
@@ -31,7 +32,7 @@ def registerUser(request):
 				data = form.cleaned_data
 				author = form.save()
 				sendValidationEmail(author)
-				message = 'Account has been created, to complete the registration process go to the link sent to your email adress (%s)' %(data['email'])
+				message = _('Account has been created, to complete the registration process go to the link sent to your email adress (%s)') %(data['email'])
 				messages.add_message(request, messages.INFO, message)
 				
 				return redirect(reverse('login_user'))
@@ -51,7 +52,7 @@ def resendEmailValidation(request):
 
 			form.resend(author)
 			
-			message = 'Email resent.'
+			message = _('Email resent.')
 			messages.add_message(request, messages.INFO, message)
 			return render_to_response('blog/resend_email.html', {'form': form}, context_instance=RequestContext(request))
 		else:
@@ -65,14 +66,14 @@ def confirm(request, confirmation_code):
 	try:
 		author = UserProfile.objects.get(confirmation_code = confirmation_code, user__is_active = False)
 	except UserProfile.DoesNotExist:
-		message = 'Wrong activation link. Try again.'
+		message = _('Wrong activation link. Try again.')
 		messages.add_message(request, messages.ERROR, message)
 		return redirect(reverse('login_user'))
 
 	author.user.is_active = True
 	author.user.save()
 	
-	message = 'Account succesfully activated.'
+	message = _('Account succesfully activated.')
 	messages.add_message(request, messages.INFO, message)
 	
 	return redirect(reverse('login_user'))
@@ -86,7 +87,7 @@ def resetPassword(request):
 				user = User.objects.get(Q(email=form.cleaned_data['username_email']) | Q(username=form.cleaned_data['username_email']))
 				form.send(user)
 			
-				message = 'Password recovery email sent.'
+				message = _('Password recovery email sent.')
 				messages.add_message(request, messages.INFO, message)
 				return render_to_response('blog/reset_password.html', {'form': form}, context_instance=RequestContext(request))
 			else:
@@ -102,7 +103,7 @@ def passwordRecovery(request, recovery_code):
 		try:
 			author = UserProfile.objects.get(recovery_code = recovery_code)
 		except UserProfile.DoesNotExist:
-			message = 'Wrong recovery link. Try again!'
+			message = _('Wrong recovery link. Try again!')
 			messages.add_message(request, messages.ERROR, message)
 			return redirect(reverse('login_user'))
 		else:
@@ -111,7 +112,7 @@ def passwordRecovery(request, recovery_code):
 			code = ''.join(random.choice(string.ascii_uppercase + string.digits + string.ascii_lowercase) for x in range(35))
 			author.recovery_code = code
 			
-			message = 'Check your email for the reset link. (%s)' % (author.user.email)
+			message = _('Check your email for the reset link. (%s)') % (author.user.email)
 			messages.add_message(request, messages.INFO, message) 
 			return redirect(reverse('login_user'))
 	else:
@@ -131,15 +132,15 @@ def login_user(request):
 						return redirect(reverse('index'))
 					else:
 						messages.add_message(request, messages.ERROR, 
-							mark_safe('''Account not activated yet, check your
+							mark_safe(_('''Account not activated yet, check your
 							 email for the validation link. <a href="
-							/blog/resend/">Not there? Resend it here!</a>'''))
+							/blog/resend/">Not there? Resend it here!</a>''')))
 
 						return render_to_response('blog/login.html', {'form': form},
 						context_instance=RequestContext(request))
 				else:
 					messages.add_message(request, messages.ERROR, 
-					'Wrong username or password.') 
+					_('Wrong username or password.')) 
 
 					return render_to_response('blog/login.html', {'form': form},
 						context_instance=RequestContext(request))
@@ -184,7 +185,7 @@ def edit_account(request):
 			form.save()
 			
 			messages.add_message(request, messages.INFO, 
-			'Your edits have been saved successfully.')
+			_('Your edits have been saved successfully.'))
 
 		return render_to_response('blog/edit_account.html', 
 			{'form': form},
@@ -270,7 +271,7 @@ def edit_one_article(request, article_pk=0):
 			art.save()
 
 		messages.add_message(request, messages.INFO, 
-			'Your edits have been saved successfully.')
+			_('Your edits have been saved successfully.'))
 
 		return render_to_response('blog/edit_one_article.html', 
 			{'article_pk': article_pk, 'form': form}, 

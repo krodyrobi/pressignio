@@ -1,0 +1,70 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2013-05-10 10:53+0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+
+#: views.py:35
+#, python-format
+msgid ""
+"Account has been created, to complete the registration process go to the "
+"link sent to your email adress (%s)"
+msgstr ""
+"Dein Konto war geschafft, um die Registration zu beenden folg den "
+"Link in deinen Email Inbox (%s)"
+
+#: views.py:55
+msgid "Email resent."
+msgstr "Email war wieder geschickt"
+
+#: views.py:69
+msgid "Wrong activation link. Try again."
+msgstr "Schlechtem Aktivation Link. Versuch es erneut."
+
+#: views.py:76
+msgid "Account succesfully activated."
+msgstr "Konto war erfolgreigh aktiviert."
+
+#: views.py:90
+msgid "Password recovery email sent."
+msgstr "Passwort Wiederherstellung Email geschickt."
+
+#: views.py:106
+msgid "Wrong recovery link. Try again!"
+msgstr "Schlechtem Wiederherstellung Link. Versuch es erneut!"
+
+#: views.py:115
+#, python-format
+msgid "Check your email for the reset link. (%s)"
+msgstr "Such in deinem Email für der Wiederherstellung Link. (%s)"
+
+#: views.py:135
+msgid ""
+"Account not activated yet, check your\n"
+"\t\t\t\t\t\t\t email for the validation link. <a href=\"\n"
+"\t\t\t\t\t\t\t/blog/resend/\">Not there? Resend it here!</a>"
+msgstr ""
+"Konto nicht gerade aktiviert, such in deinem Email "
+"für der Wiederherstellung Link. <a href=\"/blog/resend/\"> Nicht "
+"dort? Schick es wieder hier!</a>"
+
+#: views.py:143
+msgid "Wrong username or password."
+msgstr "Schlechten Username oder Passwort."
+
+#: views.py:188 views.py:274
+msgid "Your edits have been saved successfully."
+msgstr "Deine Beänderung sind erfolgreich gespeichert."
