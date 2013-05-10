@@ -5,8 +5,11 @@
 <html>
   <head>
     <title>{% trans 'Mysite' %} {% block title %}{% endblock %}</title>
+    <script src="http://code.jquery.com/jquery.js"></script>
+    <script src="{% static "bootstrap/js/bootstrap.min.js" %}"></script>
     <link href="{% static "bootstrap/css/bootstrap.min.css" %}" rel="stylesheet" media="screen">
     <link href="{% static "bootstrap/css/patch.css" %}" rel="stylesheet" media="screen">
+    <script src="{% static "bootstrap/js/patch.js" %}"></script>
     <style>
       body {
         padding-top: 60px;
@@ -56,6 +59,36 @@
               <li><a href="/blog/logout">{% trans 'Logout' %}</a></li>
               <li class="divider-vertical"></li>
               {% endif %}
+              <li>
+              <div class="btn-group">
+	            <form id="language_form" class="hide"  action="/i18n/setlang/" method="post">
+	             {% csrf_token %}
+	             <input name="next" type="hidden" value="/blog/login" />
+	             <input name="language" type="hidden" value="{{ LANGUAGE_CODE }}" />
+		        </form>
+			    <button class="btn">
+				  {% for lang in LANGUAGES %}
+				    {% if LANGUAGE_CODE == lang.0 %}
+					  <img src="{% static "bootstrap/img/1x1-pixel.png" %}" class="flag flag-{{ lang.0 }}"/> {{ lang.1 }}
+					{% endif %}
+				  {% endfor %}
+				</button>
+				<button class="btn dropdown-toggle" data-toggle="dropdown">
+    			  <span class="caret"></span>
+  				</button>
+				<ul class="dropdown-menu">
+				  {% for lang in LANGUAGES %}
+				    {% if LANGUAGE_CODE != lang.0 %}
+					  <li>
+						<a href="#" id="language_selector" data-language-code="{{ lang.0 }}" onClick="">
+    	               	  <img src="{% static "bootstrap/img/1x1-pixel.png" %}" class="flag flag-{{ lang.0 }}"/> {{ lang.1 }}
+    	               	</a>
+    	              </li>
+    	            {% endif %}
+    	          {% endfor %}
+				</ul>
+				</div>
+              </li>
             </ul>
           </div>
         </div>
@@ -75,18 +108,5 @@
       {% block content %}
       {% endblock %}
     </div>
-    
-    <form action="/i18n/setlang/" method="post">{% csrf_token %}
-	  <input name="next" type="hidden" value="/blog/login" />
-	  <select name="language">
-    	{% for lang in LANGUAGES %}
-    	<option value="{{ lang.0 }}">{{ lang.1 }}</option>
-    	{% endfor %}
-	  </select>
-	  <input type="submit" value="Go" />
-	</form>
-    
-    <script src="http://code.jquery.com/jquery.js"></script>
-    <script src="{% static "bootstrap/js/bootstrap.min.js" %}"></script>
   </body>
 </html>

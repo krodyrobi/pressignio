@@ -3,3 +3,29 @@ ul.inline>li {
 	padding-right: 0px;
 	vertical-align: bottom;
 }
+
+.language_form select {
+	width: 100px;
+}
+
+.navbar .container {
+	width: auto;
+	padding-left:20px;
+	padding-right:20px;
+}
+
+.flag {
+	position: relative;
+    bottom: 2px;
+	width: 16px;
+	height: 11px;
+	background:url(/static/bootstrap/img/flags.png) no-repeat
+}
+
+.flag.flag-de {background-position: -16px 0}
+.flag.flag-es {background-position: -32px 0}
+.flag.flag-fr {background-position: 0 -11px}
+.flag.flag-it {background-position: -16px -11px}
+.flag.flag-pt {background-position: -32px -11px}
+.flag.flag-ro {background-position: 0 -22px}
+.flag.flag-en {background-position: -16px -22px}
