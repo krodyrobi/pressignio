@@ -6,6 +6,7 @@ from django.forms import ModelForm, ValidationError
 from django.forms.util import ErrorList
 from django.db.models import Q
 from django.contrib.auth import authenticate
+from django.utils.translation import ugettext as _
 
 
 from blog.models import Article, UserProfile
@@ -18,12 +19,12 @@ import re
 
 def sendValidationEmail(author):
 	user = author.user
-	title = "Pressignio account confirmation:"
+	title = _('Pressignio account confirmation:')
 	content = "localhost:8000/blog/confirm/%s/" % (author.confirmation_code)
 	send_mail(title, content, 'pressignio-bot@presslabs.com', [user.email], fail_silently=False)
 	
 def sendPasswordRecoveryConfirm(user):
-	title = "Pressignio password recovery:"
+	title = _('Pressignio account confirmation:')
 	content = "localhost:8000/blog/passwordRecovery/%s/" % (user.get_profile().recovery_code)
 	send_mail(title, content, 'pressignio-bot@presslabs.com', [user.email], fail_silently=False)
 	
@@ -32,7 +33,7 @@ def sendRetrievePasswordEmail(user):
 	user.set_password(password)
 	user.save()
 	
-	title = "Pressignio account password:"
+	title = _('Pressignio account confirmation:')
 	content = "Username:%s\nPassword:%s" % (user.username, password)
 	send_mail(title, content, 'pressignio-bot@presslabs.com', [user.email], fail_silently=False)
 
@@ -50,12 +51,12 @@ class RegisterForm(ModelForm):
 		username = self.cleaned_data['username']
 		
 		if re.search(r'[^a-z0-9\._]+', username):
-			raise ValidationError('Illegal characters.')
+			raise ValidationError(_('Illegal characters.'))
 			
 		try:
 			check = User.objects.get(username=username)
 			
-			raise ValidationError('Username already in use, choose another username.')
+			raise ValidationError(_('Username already in use, choose another username.'))
 		except User.DoesNotExist:
 			pass		
 		
@@ -67,7 +68,7 @@ class RegisterForm(ModelForm):
 		try:
 			check = User.objects.get(email=email)
 			
-			raise ValidationError('Email already in use.')
+			raise ValidationError(_('Email already in use.'))
 		except User.DoesNotExist:
 			pass
 		
@@ -79,7 +80,7 @@ class RegisterForm(ModelForm):
 		try:
 			check = UserProfile.objects.get(name__iexact=self.cleaned_data['name'])
 			
-			raise ValidationError('This name has already been taken, please choose another.')
+			raise ValidationError(_('This name has already been taken, please choose another.'))
 		except UserProfile.DoesNotExist:
 			pass
 	
@@ -94,7 +95,7 @@ class RegisterForm(ModelForm):
 		if password != pass_check:
 			if not self._errors.has_key('pass_check'):
 				self._errors['pass_check'] = ErrorList()
-				self._errors["pass_check"].append(u'Passwords must match!')
+				self._errors["pass_check"].append(_('Passwords must match!'))
 	
 		return cleaned_data
 
@@ -122,7 +123,7 @@ class EmailResendForm(forms.Form):
 		except UserProfile.DoesNotExist:
 			if not self._errors.has_key('email'):
 				self._errors['email'] = ErrorList()
-				self._errors['email'].append(u'Email not found or user already active!')
+				self._errors['email'].append(_('Email not found or user already active!'))
 			
 		return email
     	
@@ -141,7 +142,7 @@ class ResetPasswordForm(forms.Form):
 		except ObjectDoesNotExist:
 				if not self._errors.has_key('username_email'):
 					self._errors['username_email'] = ErrorList()
-					self._errors['username_email'].append(u'No account with the email or username provided.')	
+					self._errors['username_email'].append(_('No account with the email or username provided.'))	
 				
 		return cleaned_data
 		
@@ -168,7 +169,7 @@ class AccountForm(ModelForm):
 		check = UserProfile.objects.filter(name__iexact=self.cleaned_data['name']).exclude(user__username = self.instance.user.username)
 		
 		if check:	
-			raise ValidationError('This name has already been taken, please choose another.')
+			raise ValidationError(_('This name has already been taken, please choose another.'))
 	
 		return name
 		
@@ -178,7 +179,7 @@ class AccountForm(ModelForm):
 		user = authenticate(username= self.instance.user.username, password= password)
 		
 		if user == None:
-			raise ValidationError('Wrong password')
+			raise ValidationError(_('Wrong password'))
 			
 		return password
 
@@ -193,7 +194,7 @@ class AccountForm(ModelForm):
 		if newpass != pass_check and newpass != '':
 			if not self._errors.has_key('pass_check'):
 				self._errors['pass_check'] = ErrorList()
-				self._errors["pass_check"].append(u'Passwords must match!')
+				self._errors["pass_check"].append(_('Passwords must match!'))
 	
 		return cleaned_data
 

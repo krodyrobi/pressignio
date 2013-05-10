@@ -1,0 +1,103 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2013-05-10 12:08+0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1)\n"
+
+#: forms.py:22 forms.py:27 forms.py:36
+msgid "Pressignio account confirmation:"
+msgstr "Compte Pressignio confirmation:"
+
+#: forms.py:54
+msgid "Illegal characters."
+msgstr "Caractères illégaux."
+
+#: forms.py:59
+msgid "Username already in use, choose another username."
+msgstr "Nom d'utilisateur déjà utilisé, choisir un autre nom."
+
+#: forms.py:71
+msgid "Email already in use."
+msgstr "Email déjà utilisé."
+
+#: forms.py:83 forms.py:172
+msgid "This name has already been taken, please choose another."
+msgstr "Ce nom a déjà été prise, veuillez en choisir un autre."
+
+#: forms.py:98 forms.py:197
+msgid "Passwords must match!"
+msgstr "Les mots de passe doivent correspondre!"
+
+#: forms.py:126
+msgid "Email not found or user already active!"
+msgstr "Envoyer introuvable ou utilisateur déjà actif!"
+
+#: forms.py:145
+msgid "No account with the email or username provided."
+msgstr "Pas de compte avec l'email ou le nom d'utilisateur fourni."
+
+#: forms.py:182
+msgid "Wrong password"
+msgstr "Mot de passe incorrect"
+
+#: views.py:35
+#, python-format
+msgid ""
+"Account has been created, to complete the registration process go to the "
+"link sent to your email adress (%s)"
+msgstr "Compte a été créé, afin de compléter le processus d'inscription, allez au lien envoyé à votre adresse e-mail ( %s )"
+
+#: views.py:55
+msgid "Email resent."
+msgstr "Envoyer renvoyé."
+
+#: views.py:69
+msgid "Wrong activation link. Try again."
+msgstr "Lien d'activation tort. Essayez à nouveau."
+
+#: views.py:76
+msgid "Account succesfully activated."
+msgstr "Compte succès activée."
+
+#: views.py:90
+msgid "Password recovery email sent."
+msgstr "e-mail de récupération de mot de passe envoyé."
+
+#: views.py:106
+msgid "Wrong recovery link. Try again!"
+msgstr "Lien de récupération mal. Essayez à nouveau!"
+
+#: views.py:115
+#, python-format
+msgid "Check your email for the reset link. (%s)"
+msgstr "Vérifiez vos courriels pour le lien de réinitialisation. ( %s )"
+
+#: views.py:135
+msgid ""
+"Account not activated yet, check your\n"
+"\t\t\t\t\t\t\t email for the validation link. <a href=\"\n"
+"\t\t\t\t\t\t\t/blog/resend/\">Not there? Resend it here!</a>"
+msgstr "Compte pas encore activé, vérifiez votre \n email le lien de validation. <a href=\"/blog/resend/\"> pas là? Renvoyez-le ici! </a>"
+
+#: views.py:143
+msgid "Wrong username or password."
+msgstr "Nom d'utilisateur ou mot de passe erroné."
+
+#: views.py:188 views.py:274
+msgid "Your edits have been saved successfully."
+msgstr "Vos modifications ont été sauvegardé avec succès."
+
