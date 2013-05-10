@@ -80,7 +80,7 @@
 				  {% for lang in LANGUAGES %}
 				    {% if LANGUAGE_CODE != lang.0 %}
 					  <li>
-						<a href="#" id="language_selector" data-language-code="{{ lang.0 }}" onClick="">
+						<a href="#" id="language_selector" data-language-code="{{ lang.0 }}">
     	               	  <img src="{% static "bootstrap/img/1x1-pixel.png" %}" class="flag flag-{{ lang.0 }}"/> {{ lang.1 }}
     	               	</a>
     	              </li>
