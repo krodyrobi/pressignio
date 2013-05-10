@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-05-10 10:53+0300\n"
+"POT-Creation-Date: 2013-05-10 11:37+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,14 +17,50 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
+#: forms.py:22 forms.py:27 forms.py:36
+msgid "Pressignio account confirmation:"
+msgstr "Pressignio Konto Nachweis:"
+
+#: forms.py:54
+msgid "Illegal characters."
+msgstr "Verbotene Zeichen."
+
+#: forms.py:59
+msgid "Username already in use, choose another username."
+msgstr "Username ist schon verwendet, such einen anderen aus."
+
+#: forms.py:71
+msgid "Email already in use."
+msgstr "Email war wieder geschickt"
+
+#: forms.py:83 forms.py:172
+msgid "This name has already been taken, please choose another."
+msgstr "Dieser Name ist schon verwendet, bitte such einen anderen aus."
+
+#: forms.py:98 forms.py:197
+msgid "Passwords must match!"
+msgstr "Passwörter müssen übereinstimmen!"
+
+#: forms.py:126
+msgid "Email not found or user already active!"
+msgstr "Email nicht gefunden oder Konto is schon aktiv!"
+
+#: forms.py:145
+msgid "No account with the email or username provided."
+msgstr "Kein Konto mit dem Email or Username gefunden."
+
+#: forms.py:182
+msgid "Wrong password"
+msgstr "Schlechten Username oder Passwort."
+
 #: views.py:35
 #, python-format
 msgid ""
 "Account has been created, to complete the registration process go to the "
 "link sent to your email adress (%s)"
 msgstr ""
-"Dein Konto war geschafft, um die Registration zu beenden folg den "
-"Link in deinen Email Inbox (%s)"
+"Dein Konto war geschafft, um die Registration zu beenden folg den Link in "
+"deinen Email Inbox (%s)"
 
 #: views.py:55
 msgid "Email resent."
@@ -57,9 +93,8 @@ msgid ""
 "\t\t\t\t\t\t\t email for the validation link. <a href=\"\n"
 "\t\t\t\t\t\t\t/blog/resend/\">Not there? Resend it here!</a>"
 msgstr ""
-"Konto nicht gerade aktiviert, such in deinem Email "
-"für der Wiederherstellung Link. <a href=\"/blog/resend/\"> Nicht "
-"dort? Schick es wieder hier!</a>"
+"Konto nicht gerade aktiviert, such in deinem Email für der Wiederherstellung "
+"Link. <a href=\"/blog/resend/\"> Nicht dort? Schick es wieder hier!</a>"
 
 #: views.py:143
 msgid "Wrong username or password."
