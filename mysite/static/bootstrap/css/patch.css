@@ -4,14 +4,18 @@ ul.inline>li {
 	vertical-align: bottom;
 }
 
+.dropdown-menu {
+	min-width: 100px;
+}
+
 .language_form select {
 	width: 100px;
 }
 
 .navbar .container {
 	width: auto;
-	padding-left:20px;
-	padding-right:20px;
+	padding-left: 20px;
+	padding-right: 20px;
 }
 
 .flag {
@@ -19,7 +23,7 @@ ul.inline>li {
     bottom: 2px;
 	width: 16px;
 	height: 11px;
-	background:url(/static/bootstrap/img/flags.png) no-repeat
+	background: url(/static/bootstrap/img/flags.png) no-repeat
 }
 
 .flag.flag-de {background-position: -16px 0}
