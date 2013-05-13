@@ -8,6 +8,16 @@ ul.inline>li {
 	min-width: 100px;
 }
 
+.navbar .navbar-inner .navbar-fixed-top {
+	min-width: 1100px;
+}
+
+.body {
+	min-width: 960px;
+	padding-top: 60px;
+    padding-bottom: 40px;
+}
+
 .language_form select {
 	width: 100px;
 }
