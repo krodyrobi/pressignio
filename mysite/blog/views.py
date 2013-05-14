@@ -12,17 +12,19 @@ from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_POST
 
 from blog.forms import LoginForm, RegisterForm, ArticleForm,\
-	EditForm, DeleteForm, AccountForm, EmailResendForm, ResetPasswordForm,\
-	sendValidationEmail, sendRetrievePasswordEmail
+    EditForm, DeleteForm, AccountForm, EmailResendForm, ResetPasswordForm,\
+    sendValidationEmail, sendRetrievePasswordEmail
 from blog.models import Article, UserProfile
 
 import random
 import string
 
+
 def index(request):
-	latest_articles_list = Article.objects.all().order_by('-publication_date')[:10]
-	return render_to_response('blog/index.html', {'latest_articles_list': latest_articles_list}, context_instance=RequestContext(request))
-		
+    latest_art_list = Article.objects.all().order_by('-publication_date')[:10]
+
+    return render_to_response('blog/index.html', {'latest_art_list': latest_art_list}, context_instance=RequestContext(request))
+
 def registerUser(request):
 	if request.user.is_anonymous():
 		if request.method == 'POST':	
